@@ -4,11 +4,83 @@ author: "Joseph Sepich (jps6444)"
 date: "8/31/2020"
 output:
   pdf_document:
-    number_sections: true
+    number_sections: false
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# NICE
+# 1. What is the best way to contact the instructor?
+
+# 2. Describe a resource listed in the syllabus (do not copy and paste).
+
+# 3. When do you have to complete the assigned readings per lecture?
+
+# 4. With the exception of the first homework, when are homeworks due?
+
+# 5. What is the general policy regarding collaboration?
+
+# 6. What are the different elements of the class that will be graded, and what is their percentage contribution to the total grade?
+
+# 7. What are the two elements of the final project, and what format can they be delivered?
+
+# 8. In your own words, describe two etiquette principles for zoom meetings.
+
+# 9. Have you read the syllabus in its entirety and understood it?
+
+# 10. Do you agree to abide by the principles listed in the syllabus?
+
+# 11. Basic definitions.
+
+Let $X$ be an exponential random variable with rate parameter $\lambda>0$.
+
+## (a) What is the range of $X$, its PDF, and its CDF?
+
+## (b) What is the $n^{th}$ moment of $X$?
+
+## (c) What are the mean and variance of $X$?
+
+## (d) Let $\epsilon >0$. What should $a$ be so that $(P(X > a) = \epsilon$?
+
+# 12. Transformations of random variables.
+
+Let $\{X_i\}_{i=1}^N$ be i.i.d. exponential random variables with parameter $\lambda$. Let $(Y,Z) = T(X_1, X_2)$, where $T: D \rightarrow R$ is the transformation.
+
+\[T(x, x') := (x + x', x - x')\]
+
+## (a) What is the joint PDF of $\{X_i\}_{i=1}^N$?
+
+## (b) What is the domain $D$ of $T$?
+
+## (c) What is the inverse transformation of $T^{-1}$, and its Jacobian determinant?
+
+## (d) What is the range $R$ of $T$?
+
+## (e) What is the joint PDF of $Y$ and $Z$? Provide the support also.
+
+## (f) What are the marginal PDFs of $Y$ and $Z$?
+
+# 13. Important Theorems
+
+State the following.
+
+## (a) The Central Limit Theorem
+
+## (b) The Weak Law of Large Numbers
+
+# 14. MLE
+
+Suppose that $X_1,X_2,...,X_n$ are i.i.d. random variables with PDF:
+
+\[f_x(x) = \frac{x}{a}exp\{\frac{-x^2}{2a}\}, x \geq 0\]
+
+## (a) Find the maximum likelihood estimate of the parameter a.
+
+## (b) Find the Fisher Information of $X_1,X_2,...,X_n$ and use it to estimate a 95% confidence interval on the MLE of a.
+
+## (c) Explain how the central limit theorem relates to the previous quesiton.
+
+# 15. Good 'ol Bayes.
+
+A lab blood test is 95% effective in detecting a certain disease when the disease is present. However, if a healthy individual is tested, there is a 1% chance that the test result will imply that this individual has the disease. If it is known that 5% of the population have the disease, what is the probability that a person has the disease, given that the test says they do?
