@@ -13,23 +13,43 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # 1. What is the best way to contact the instructor?
 
+The best way to contact the instructor is through the Canvas messaging/email system and **not** via Penn State email.
+
 # 2. Describe a resource listed in the syllabus (do not copy and paste).
+
+One of the resources listed in the syllabus is Counseling and Psychological Services as UP otherwise known as CAPS. CAPS is a place for students to go regarding their mental health and will provide students with counseling or other services to help combat mental health issues that may effect their academic progress, social development, or emotional wellbeing. Sometimes CAPS even brings dogs during finals week to pet!
 
 # 3. When do you have to complete the assigned readings per lecture?
 
+The assigned readings must be completed **before each lecture**, so that you are prepared to participate in the lecture.
+
 # 4. With the exception of the first homework, when are homeworks due?
+
+The homework in STAT 440 will be due weekly on Fridays at 17:00 EST. (The first homework is due Monday Aug 31)
 
 # 5. What is the general policy regarding collaboration?
 
+Collaboration is encouraged in this class and will be enabled through the use of Canvas discussions or Piazza. This will allow for us to bounce ideas off each other and ask questions about the homework or general concepts in the class. The important aspect of this policy is that any work submitted must be your own as plagiarism is, was, and will always be unacceptable.
+
 # 6. What are the different elements of the class that will be graded, and what is their percentage contribution to the total grade?
+
+As denoted in the syllabus, **participation** will count towards 10% of the grade. Each of the other three elements, **homework**, **exams**, and the **final project** will count for 30% of the final grade.
 
 # 7. What are the two elements of the final project, and what format can they be delivered?
 
+The final project will involve both a presentation in class and a final report in the style of an academic paper. The final report can also be delivered in an alternative format such as a comic or movie; however any alternative mediums must be pre-approved.
+
 # 8. In your own words, describe two etiquette principles for zoom meetings.
+
+Two important Zoom etiquette principles are to remain engaged and to attend all classes on time. Just as if we were meeting in person, zoom lectures will start at the scheduled time, so you must be on time and remember that early is on time, and on time is late. Remaining engaged, the other principle, is vital for having productive lectures and a productive class. This principle includes not opening other stuff on the computer during lecture or having a "hot mic" playing music.
 
 # 9. Have you read the syllabus in its entirety and understood it?
 
+I, Joseph Sepich, have read the syllabus in its entirety and understood it.
+
 # 10. Do you agree to abide by the principles listed in the syllabus?
+
+I, Joseph Sepich, agree to abide by the principles listed in the syllabus.
 
 # 11. Basic definitions.
 
