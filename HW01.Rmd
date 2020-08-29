@@ -1,0 +1,14 @@
+---
+title: "Homework 01 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "8/31/2020"
+output:
+  pdf_document:
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# NICE
