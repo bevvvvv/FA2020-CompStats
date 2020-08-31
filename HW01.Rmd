@@ -148,9 +148,30 @@ Suppose that $X_1,X_2,...,X_n$ are i.i.d. random variables with PDF:
 
 ## (a) Find the maximum likelihood estimate of the parameter a.
 
+Recall that the likelihood of a parameter is related to the joint pdf:
+
+\[L(a) = \frac{\Pi x_i}{a^n}exp\{\Sigma_{i=1}^n-x_i^2/2a\}\]
+
+The maximum likelihood estimate is the point in the function that would cause a max. Let's derivate w.r.t a.
+
+\[L'(a) = \frac{-n \Pi x_i}{a^na}exp\{\frac1{2a}\Sigma_{i=1}^n-x_i^2\} + \frac{\Pi x_i}{a^n}\frac{-1}{2a^2}exp\{\frac1{2a}\Sigma_{i=1}^n-x_i^2\}\]
+
+Setting this equal to zero to maximize we can remove the exp term (that would divide out):
+
+\[0 = \frac{-n \Pi x_i}{a^na} + \frac{\Pi x_i}{a^n}\frac{-1}{2a^2}\]
+\[\frac{n \Pi x_i}{a^na} = \frac{\Pi x_i}{a^n}\frac{-1}{2a^2}\]
+\[\frac{n}{a} = \frac{-1}{2a^2}\]
+\[a = \frac{-1}{2n}\]
+
 ## (b) Find the Fisher Information of $X_1,X_2,...,X_n$ and use it to estimate a 95% confidence interval on the MLE of a.
 
-## (c) Explain how the central limit theorem relates to the previous quesiton.
+The loglikelihood is $l(a) = ln(\frac{\Pi x_i}{a^n}) + \frac1{2a}\Sigma_{i=1}^n-x_i^2$. We can use this to find the Fisher Information:
+
+\[I(a) = -E[\frac{2n^2-n}{\Pi x_i}a^{2n-2} + \frac1{a^3}\Sigma_{i=1}^n-x_i^2]\]
+
+This makes our 95% confidence interval:
+
+\[a +- \frac{1}{\sqrt{-E[\frac{2n^2-n}{\Pi x_i}a^{2n-2} + \frac1{a^3}\Sigma_{i=1}^n-x_i^2]}}\]
 
 # 15. Good 'ol Bayes.
 
