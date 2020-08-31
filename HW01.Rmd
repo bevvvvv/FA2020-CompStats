@@ -96,15 +96,37 @@ Let $\{X_i\}_{i=1}^N$ be i.i.d. exponential random variables with parameter $\la
 
 ## (a) What is the joint PDF of $\{X_i\}_{i=1}^N$?
 
+The PDF of a single exponential random variable as denoted above is $f(x) = \lambda e^{-\lambda x}$. When we multiply n of these independent, identically distributed random variables we then get the joint PDF of
+
+\[f(x) = \lambda^n e^{-\lambda \Sigma_{i=0}^nX_i}\]
+
 ## (b) What is the domain $D$ of $T$?
+
+The domain of the T is $[0, \infty)$, since it any value that a R.V. $X$ can take. The domain could also be denoted as $R^2$ as it is 2-dimensional.
 
 ## (c) What is the inverse transformation of $T^{-1}$, and its Jacobian determinant?
 
+The inverse transformation of $T^{-1} := (\frac12(Y + Z), \frac12(Y -Z))$. This gives use the Jacobian determinant:
+
+\[\frac{d(0.5(Y+Z))}{Y}\frac{d(0.5(Y-Z))}{Z}- \frac{d(0.5(Y+Z))}{Z}\frac{d(0.5(Y-Z))}{Y}=-0.25-(0.25)=-0.5\]
+
 ## (d) What is the range $R$ of $T$?
+
+The range $R$ of $T$ is the same as the domain $R^2$.
 
 ## (e) What is the joint PDF of $Y$ and $Z$? Provide the support also.
 
+The joint pdf of $Y$ is $\lambda (e^{-\lambda x} + e^{-\lambda x'})$. The joint pdf of $Z$ is $\lambda (e^{-\lambda x} - e^{-\lambda x'})$. The support is positive real numbers.
+
 ## (f) What are the marginal PDFs of $Y$ and $Z$?
+
+Marginal PDFs of $Y$ (same for either x, just replace the x with x' and the term):
+
+\[\int{\lambda (e^{-\lambda x} + e^{-\lambda x'})dx} = - e^{-\lambda x} + \lambda x e^{-\lambda x'}\]
+
+Marginal PDFs of $Z$ (only difference is the sign)
+
+\[\int{\lambda (e^{-\lambda x} - e^{-\lambda x'})dx} = - e^{-\lambda x} - \lambda x e^{-\lambda x'}\]
 
 # 13. Important Theorems
 
