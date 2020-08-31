@@ -57,11 +57,36 @@ Let $X$ be an exponential random variable with rate parameter $\lambda>0$.
 
 ## (a) What is the range of $X$, its PDF, and its CDF?
 
+The PDF of $X$ is $f(x) = \lambda e^{-\lambda x}$ and the CDF is $F(x) = 1 - e^{-\lambda x}$. The support of $X$ is $[0, \infty)$.
+
 ## (b) What is the $n^{th}$ moment of $X$?
+
+The moment generating function for an exponential variable is
+
+\[M_X(t) = \frac{\lambda}{\lambda - t}\]
+
+The $n^{th}$ moment is represented as 
+
+\[M_X^{(n)}(0) = \frac{n!}{\lambda^n}\]
+
+This value is derived from the taking the derivative multiple times.
 
 ## (c) What are the mean and variance of $X$?
 
+Mean: $\mu = \frac{1}{\lambda}$
+
+Variance: $${\sigma}^ 2 = \frac{1}{\lambda^2} $$
+
 ## (d) Let $\epsilon >0$. What should $a$ be so that $(P(X > a) = \epsilon$?
+
+For this let us use the CDF we defined above: $F(x) = 1 - e^{-\lambda x}$. We must determine for what value $1 - F(a) = \epsilon$. 
+
+\[1 - (1 - e^{-\lambda a}) = \epsilon\]
+\[e^{-\lambda a} = \epsilon\]
+\[-\lambda a  = ln(\epsilon)\]
+\[a = -\frac{ln(\epsilon)}{\lambda}\]
+
+$a$ must be $-\frac{ln(\epsilon)}{\lambda}$ for the probability of $X > a$ to be $\epsilon$.
 
 # 12. Transformations of random variables.
 
