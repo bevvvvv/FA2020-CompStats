@@ -87,7 +87,11 @@ State the following.
 
 ## (a) The Central Limit Theorem
 
+The Central Limit Theorem states that the sampling distribution of the sample means approximates that of a normal distribution as the sample size becomes larger. Generally a sample size of 30 is considered large enough for this to be true. Paraphrased this theorem means that the average of your sample means will become normally distributed around the population mean.
+
 ## (b) The Weak Law of Large Numbers
+
+The Weak Law of Large Numbers states that the average of the results from a large number of trials should approach the expected value, assuming independent and identically distributed random variables that are being sampled.
 
 # 14. MLE
 
