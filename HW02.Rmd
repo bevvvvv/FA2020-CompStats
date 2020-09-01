@@ -72,4 +72,41 @@ print(sd(dists))
 
 Find vectors $y_j$ so that the $j^{th}$ of $D_{y_j}$ is the average distance from $v_j$ to all other points. Report these numbers.
 
+# Problem 3
 
+## 3a
+
+Build a simple linear regression function using ordinary least squares that takes two inputs $x$ and $y$, fits $y$ to $x$, and returns the slope and intercept. Use it to fit the **iron** column to the **calcium** column in the **nutrient** dataset.
+
+```{r}
+ols_regress <- function(x, y) {
+  slope_numerator <- cov(x, y)
+  slope_denom <- var(x)
+  slope <- slope_numerator / slope_denom
+  inter <- mean(y) - slope * mean(x)
+  return(list("slope" = slope, "intercept" = inter))
+}
+```
+
+```{r}
+# load dataset
+nutrient_df <- read.csv('./data/nutrient.csv')
+
+# perform regression
+model <- ols_regress(nutrient_df$calc, nutrient_df$iron)
+print('Slope:')
+print(model$slope)
+print('Intercept:')
+print(model$intercept)
+```
+
+## 3b
+
+Learn how to use the R function **lm** and use it to fit iron to calcium. Use the **summary** function on the output of **lm** and compare it to the output of your function in (a).
+
+```{r}
+model <- lm(iron~calc,data=nutrient_df)
+summary(model)
+```
+
+The output of the lm function regression of fitting **iron** to **calcium** has the same estimate for the intercept and slope.
