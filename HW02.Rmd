@@ -62,9 +62,9 @@ Use $D$ to compute the average and standard deviation of these distances. Be car
 
 ```{r}
 dists <- mat_d[upper.tri(mat_d,diag=TRUE)]
-print('Average:')
+# Average
 print(mean(dists))
-print('Standard Dev:')
+# Standard Deviation
 print(sd(dists))
 ```
 
@@ -91,12 +91,14 @@ ols_regress <- function(x, y) {
 ```{r}
 # load dataset
 nutrient_df <- read.csv('./data/nutrient.csv')
+```
 
+```{r}
 # perform regression
 model <- ols_regress(nutrient_df$calc, nutrient_df$iron)
-print('Slope:')
+# Slope
 print(model$slope)
-print('Intercept:')
+# Intercept
 print(model$intercept)
 ```
 
@@ -110,3 +112,80 @@ summary(model)
 ```
 
 The output of the lm function regression of fitting **iron** to **calcium** has the same estimate for the intercept and slope.
+
+# Book Problems
+
+## Chapter 2 Problem 1
+
+Instead of copying the table in the book, use the full dataset Deer.txt, available in Canvas. Use $ instead of c to extract the appropriate columns and give the average for all animals, not just the seven that are shown. Hint: If you need to tell a function not to include NA values. use na.rm=TRUE as an argument.
+
+```{r}
+# read dataset
+deers <- read.delim('./data/Deer.txt')
+```
+
+```{r}
+# create length var
+Length <- deers$LCT
+Tb <- deers$Tb
+
+# Average length
+print(mean(Length, na.rm = TRUE))
+```
+
+## Chapter 2 Problem 2
+
+```{r}
+Farm <- deers$Farm
+Month <- deers$Month
+
+Boar <- cbind(Month, Length, Tb)
+
+# Number of animals
+print(nrow(Boar))
+
+# Number of variables
+print(ncol(Boar))
+
+# Number of animals, Number of variables
+print(dim(Boar))
+```
+
+## Chapter 2 Problem 5
+
+```{r}
+# Confirm data type
+print(str(deers))
+
+deers$sqrtLength <- sqrt(deers$LCT)
+deers$sqrtLength[1:5]
+```
+
+```{r}
+deer_list <- list(length = deers$LCT, Farm = Farm)
+print(str(deer_list))
+
+deer_list$sqrtLength <- sqrt(deer_list$length)
+deer_list$sqrtLength[1:5]
+```
+
+There was no real difference in performing the operation in the list versus the data.frame. This holds true, because the data.frame data structure is merely a list with certain rules imposed such as each element/column must be the same length.
+
+## Chapter 2 Problem 6
+
+```{r}
+data_file <- './data/ISIT.txt'
+bio_read <- read.table(data_file)
+# bio_scan <- scan(data_file, what="character")
+bio_scan <- scan(data_file, what = list("", "", "", "", "", "", "", "", "", "", "", "", "", ""))
+
+str(bio_read)
+str(bio_scan)
+
+is.data.frame(bio_read)
+is.data.frame(bio_scan)
+is.matrix(bio_read)
+is.matrix(bio_scan)
+```
+
+The read.table function will read the text file directly into a data frame object while the scan function will create a single long vector containing each value in the text file. You can also scan each column into separate elements of a list by specifying a list in the what parameter of the scan function.
