@@ -62,10 +62,8 @@ Use $D$ to compute the average and standard deviation of these distances. Be car
 
 ```{r}
 dists <- mat_d[upper.tri(mat_d,diag=TRUE)]
-# Average
-print(mean(dists))
-# Standard Deviation
-print(sd(dists))
+print(paste0('Average: ', mean(dists)))
+print(paste0('Standard Deviation: ', sd(dists)))
 ```
 
 ## 2c
@@ -96,10 +94,8 @@ nutrient_df <- read.csv('./data/nutrient.csv')
 ```{r}
 # perform regression
 model <- ols_regress(nutrient_df$calc, nutrient_df$iron)
-# Slope
-print(model$slope)
-# Intercept
-print(model$intercept)
+print(paste0('Slope: ', model$slope))
+print(paste0('Intercept: ', model$intercept))
 ```
 
 ## 3b
@@ -129,8 +125,7 @@ deers <- read.delim('./data/Deer.txt')
 Length <- deers$LCT
 Tb <- deers$Tb
 
-# Average length
-print(mean(Length, na.rm = TRUE))
+print(paste0('Average length: ', mean(Length, na.rm = TRUE)))
 ```
 
 ## Chapter 2 Problem 2
@@ -141,14 +136,8 @@ Month <- deers$Month
 
 Boar <- cbind(Month, Length, Tb)
 
-# Number of animals
-print(nrow(Boar))
-
-# Number of variables
-print(ncol(Boar))
-
-# Number of animals, Number of variables
-print(dim(Boar))
+print(paste0('# of animals: ', nrow(Boar), ' same as ' ,dim(Boar)[1]))
+print(paste0('# of vars: ', ncol(Boar), ' same as ', dim(Boar)[2]))
 ```
 
 ## Chapter 2 Problem 5
@@ -175,7 +164,7 @@ There was no real difference in performing the operation in the list versus the 
 
 ```{r}
 data_file <- './data/ISIT.txt'
-bio_read <- read.table(data_file)
+bio_read <- read.table(data_file, header = TRUE)
 # bio_scan <- scan(data_file, what="character")
 bio_scan <- scan(data_file, what = list("", "", "", "", "", "", "", "", "", "", "", "", "", ""))
 
@@ -189,3 +178,59 @@ is.matrix(bio_scan)
 ```
 
 The read.table function will read the text file directly into a data frame object while the scan function will create a single long vector containing each value in the text file. You can also scan each column into separate elements of a list by specifying a list in the what parameter of the scan function.
+
+## Chapter 3 Problem 2
+
+```{r}
+# extract data from station 1
+station_1 <- bio_read[which(bio_read$Station == 1),]
+summary(station_1$SampleDepth)
+
+# extract data from station 2
+station_2 <- bio_read[which(bio_read$Station == 2),]
+summary(station_2$SampleDepth)
+
+# extract data from station 3
+station_3 <- bio_read[which(bio_read$Station == 3),]
+summary(station_3$SampleDepth)
+```
+
+```{r}
+# find low sample size stations
+station_counts <- table(bio_read$Station)
+station_counts
+```
+
+Stations 4 and 5 have considerably fewer observations, so we will omit them.
+
+```{r}
+# remove stations 4 and 5
+bio_sub <- bio_read[which((bio_read$Station != 4) & (bio_read$Station != 5)),]
+unique(bio_sub$Station)
+```
+
+```{r}
+# extract 2002 data
+data <- bio_read[which(bio_read$Year == 2002),]
+paste0('# of rows: ', nrow(data))
+paste0('Unique years in data: ', unique(data$Year))
+
+# extract April data
+data <- bio_read[which(bio_read$Month == 4),]
+paste0('# of rows: ', nrow(data))
+paste0('Unique months in data: ', unique(data$Month))
+
+# extract measurements greater than 2000m depth
+data <- bio_read[which(bio_read$SampleDepth > 2000),]
+paste0('# of rows: ', nrow(data))
+paste0('Min depth of data: ', min(data$SampleDepth))
+
+# show data by increasing depth values
+data <- bio_read[order(bio_read$SampleDepth),]
+data[1:20,]
+
+# show data at depths > 2000 in April
+data <- bio_read[which((bio_read$SampleDepth > 2000) & (bio_read$Month == 4)),]
+data[1:20,]
+```
+
