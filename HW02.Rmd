@@ -22,9 +22,7 @@ Which of the following is an appropriate variable name?
 Recall that if $x := (x_1,...,x_d) \in R^d$, then the euclidean norm of $x$ is $||x||_2 = \sqrt{\Sigma_{i=1}^dx_i^2}$. Let
 
 $$
-V = [v_1, v_2, v_3, v_4, v_5] =
-
-\begin{array}{|c c c c c|}
+V = [v_1, v_2, v_3, v_4, v_5] = \begin{array}{|c c c c c|}
 1 & 2 & 4 & -1 & 0\\
 2 & 1 & -4 & 1 & 3\\
 3 & 0 & 1 & -1 & 5
@@ -44,9 +42,34 @@ Use R to do the following
 Create a matrix $D$ made out of the norm of all pairwise distances of the column vectors of V. That is, the $ij^{th}$ entry of $D$ is $||v_i - v_j||_2$.
 
 ```{r}
+l2_norm <- function(vec) {
+  sqrt(sum(vec^2))
+}
 
+num_cols <- dim(mat_v)[2]
+mat_d <- matrix(1:25, nrow = num_cols, ncol = num_cols)
+for (i in 1:num_cols) {
+  for (j in 1:num_cols) {
+    mat_d[i, j] <- l2_norm(mat_v[,i] - mat_v[,j])
+  }
+}
+mat_d
 ```
 
+## 2b
 
+Use $D$ to compute the average and standard deviation of these distances. Be careful not to double count.
+
+```{r}
+dists <- mat_d[upper.tri(mat_d,diag=TRUE)]
+print('Average:')
+print(mean(dists))
+print('Standard Dev:')
+print(sd(dists))
+```
+
+## 2c
+
+Find vectors $y_j$ so that the $j^{th}$ of $D_{y_j}$ is the average distance from $v_j$ to all other points. Report these numbers.
 
 
