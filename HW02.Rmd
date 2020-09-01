@@ -68,7 +68,19 @@ print(paste0('Standard Deviation: ', sd(dists)))
 
 ## 2c
 
-Find vectors $y_j$ so that the $j^{th}$ of $D_{y_j}$ is the average distance from $v_j$ to all other points. Report these numbers.
+Find vectors $y_j$ so that the $j^{th}$ of $D{y_j}$ is the average distance from $v_j$ to all other points. Report these numbers.
+
+```{r}
+mat_d %*% c(0.2,0.2,0.2,0.2,0.2)
+```
+
+```{r}
+for (i in 1:5) {
+  print(mean(mat_d[i,]))
+}
+```
+
+The vector $y_j = (\frac15,\frac15,\frac15,\frac15,\frac15)$ will make the vector $Dy_j$ the average distance from each column vector to the other vectors, because there are 5 total columns, and matrix vector multiplication will multiply this value by the values in the row (which represent all the distances) and then sum them.
 
 # Problem 3
 
@@ -234,3 +246,66 @@ data <- bio_read[which((bio_read$SampleDepth > 2000) & (bio_read$Month == 4)),]
 data[1:20,]
 ```
 
+# Sampling Basics
+
+## Problem 1
+
+Obtain 1000 samples from the chi-squared distribution with 1 degree of freedom by first sampling 1000 samples $Z_i$ from a standard normal distribution, and then applying the appropriate transformation. Plot a histogram of the results. Overlay a curve onto the histogram denoting the true density.
+
+```{r}
+# standard normal sample
+num <- 1000
+samples <- rnorm(num)
+```
+
+Recall the definition of a chi-square distribution with k degrees of freedom:
+
+\[Q = \Sigma_{i=1}^kZ_i^2\]
+
+For one degree of freedom this would merely be squaring each sample.
+
+\[Q_i = Z_i^2\]
+
+```{r}
+# transform
+chi_samples <- samples^2
+# histogram
+hist(chi_samples)
+
+# overlay true density
+df <- 1
+x <- seq(0, 12, 0.1)
+y <- dchisq(x, df) * num
+lines(x,y)
+```
+
+## Problem 2
+
+Repeat the previous question, but produce t-distributed random variables with 5 degrees of freedom. Do this by only generating standard normals (then transforming them the appropriate way).
+
+Recall the Student's t distribution follows the formula below where the distribution has $n$ degrees of freedom.
+
+\[\frac{Z}{\sqrt{\chi^2/n}}\]
+
+
+```{r}
+df <- 5
+t <- vector(mode='numeric', length=num)
+z_samples <- rnorm(df * num)
+samples <- rnorm(num)
+test <- c(0)
+for (i in seq(1, df * num, df)) {
+  start <- i
+  end <- i + df -1
+  sub_samp <- z_samples[start:end]
+  test <- append(test, sub_samp)
+  chi <- sum(sub_samp^2)
+  t[i/df] <- samples[i/df] / (sqrt(chi / df))
+}
+hist(t)
+
+# overlay true sample
+x <- seq(-20, 20, 0.1)
+y <- dt(x, df) * num
+lines(x,y)
+```
