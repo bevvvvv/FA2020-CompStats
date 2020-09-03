@@ -177,7 +177,8 @@ There was no real difference in performing the operation in the list versus the 
 ```{r}
 data_file <- './data/ISIT.txt'
 bio_read <- read.table(data_file, header = TRUE)
-# bio_scan <- scan(data_file, what="character")
+#bio_scan <- scan(data_file, what = 'character')
+#bio_scan <- scan(data_file, what = 'real', skip=1)
 bio_scan <- scan(data_file, what = list("", "", "", "", "", "", "", "", "", "", "", "", "", ""))
 
 str(bio_read)
