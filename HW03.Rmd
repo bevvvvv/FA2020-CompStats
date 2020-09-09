@@ -205,6 +205,27 @@ This gives us our inverse CDF:
 
 # Problem 4
 
+Simulate 100 i.i.d. random variables from the density f of the previous problem using the inverse-CDF method. Assume $\sigma^2=2$. Plot a histogram of the resulting realizations together with a curve of the density function f(z).
+
+```{r}
+inverse_cdf <- function(x, sigma) {
+  sqrt(-2 * sigma^2 * log(x))
+}
+
+f_dens <- function(z, sigma) {
+  (z / sigma^2) * exp(-1 * z^2 / (2 * sigma^2))
+}
+
+n <- 1000
+sigma <- sqrt(2)
+samples <- runif(n)
+samples <- inverse_cdf(samples, sigma)
+hist(samples)
+x <- seq(0, 10, 0.1)
+y <- f_dens(x, sigma) * n
+lines(x,y)
+```
+
 # Problem 5
 
 ## Part a
