@@ -156,9 +156,52 @@ If $l<<L$, then the using $M^l$ would require much less memory and involve less 
 
 # Problem 3
 
+Consider the density:
+
+\[f(x) = \frac{x}{\sigma^2}e^{-x^2/2\sigma^2}\]
+
 ## Part a
 
+To show that this is a valid density we must recall the two properties that make this a valid density.
+
+1. $f(x) \geq 0$
+2. $\int_{0}^{\infty}f(x)dx = 1$
+
+We are already given that the first property is satisfied, since $x \geq 0$, the density also has to be. The numerator of the fraction coefficient is x and the other place it apears is as an exponent, which negative values will merely give a number less than one, but greater than zero.
+
+For the second property let's take the integral:
+
+\[\int_{0}^{\infty}f(x)dx = \int_{0}^{\infty}\frac{x}{\sigma^2}e^{-x^2/2\sigma^2}dx\]
+
+To do this let's use u substitution where $u = \frac{-x^2}{2\sigma^2}; du = \frac{-x}{\sigma^2}dx \rightarrow dx = -\frac{-\sigma^2}{x}du$
+
+\[\int_{-\infty}^{0}e^{u}du = (e^u)|_{-\infty}^{0} = 1 - 0 = 1\]
+
+We have now satisfied both properties for a valid probability density function.
+
 ## Part b
+
+Compute the CDF and its inverse. To compute the CDF of a density function, we merely integrate the function from its start to some value a:
+
+\[\int_{0}^{a}\frac{x}{\sigma^2}e^{-x^2/2\sigma^2}dx\]
+
+We can use the same u sub where $u = \frac{-x^2}{2\sigma^2}; du = \frac{-x}{\sigma^2}dx \rightarrow dx = -\frac{-\sigma^2}{x}du$.
+
+\[\int_{-\infty}^{\frac{-a^2}{2\sigma^2}}e^{u}du = (e^u)|_{-\infty}^{\frac{-a^2}{2\sigma^2}} = e^{\frac{-a^2}{2\sigma^2}} -0 = e^{\frac{-a^2}{2\sigma^2}}\]
+
+\[F_x(x) = e^{\frac{-x^2}{2\sigma^2}}\]
+
+Now let's calculate the inverse.
+
+\[y = e^{\frac{-x^2}{2\sigma^2}}\]
+\[ln(y) = \frac{-x^2}{2\sigma^2}\]
+\[2ln(y)\sigma^2 = -x^2\]
+\[-2ln(y)\sigma^2 = x^2\]
+\[\sqrt{-2ln(y)\sigma^2} = x\]
+
+This gives us our inverse CDF:
+
+\[F^{-1}_x(y) = \sqrt{-2ln(y)\sigma^2}\]
 
 # Problem 4
 
