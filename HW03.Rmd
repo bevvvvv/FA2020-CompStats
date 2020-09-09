@@ -126,7 +126,33 @@ plot(decomp$values)
 
 ## Part c
 
+```{r}
+frob_norm <- function(mat_input) {
+  decomp <- eigen(mat_input)
+  return(sqrt(sum(decomp$values^2)))
+}
+```
+
+```{r}
+epsilon <- 0.5
+
+# the eigen values are the diagonal entries of lambda
+for (l in 1:length(decomp$values)) {
+  diag_entries <- numeric(length(decomp$values))
+  diag_entries[1:l] <- decomp$values[1:l]
+  sig_l <- decomp$vectors %*% diag(diag_entries) %*% t(decomp$vectors)
+  mat_diff <- mat_sig - sig_l
+  err_val <- frob_norm(mat_diff) / frob_norm(mat_sig)
+  print(err_val)
+}
+```
+
+
+The minimum l, so that $\frac{||\Sigma - \Sigma^l||_F}{||\Sigma||_F} < \epsilon$ is just 1. This would imply that a majority of the variance/information contained within the original matrix $\Sigma$ is stored within the first eigen value/vector. Basically when you start with l = 1, you will receive a matrix that is very close to the values in $\Sigma$, and as you increase l, the matrix becomes closer to $\Sigma$ itself, but the larger values contribute more information.
+
 ## Part d
+
+If $l<<L$, then the using $M^l$ would require much less memory and involve less computation time, because you would only need to store the first l eigen vectors/eigen values to calculate the matrix. This is the entire idea behind principal component analysis and dimension reduction. If our error from the Frobenius norm is small enough this replacement is justified, because we will still maintain a majority of the information/variance from the original matrix. 
 
 # Problem 3
 
