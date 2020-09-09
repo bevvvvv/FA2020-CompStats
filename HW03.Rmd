@@ -220,9 +220,9 @@ n <- 1000
 sigma <- sqrt(2)
 samples <- runif(n)
 samples <- inverse_cdf(samples, sigma)
-hist(samples)
+hist(samples, freq=FALSE)
 x <- seq(0, 10, 0.1)
-y <- f_dens(x, sigma) * n
+y <- f_dens(x, sigma)
 lines(x,y)
 ```
 
@@ -230,4 +230,52 @@ lines(x,y)
 
 ## Part a
 
+We must find a value c such that $\frac{f(x)}{g(x)} \leq c < \infty$ where f is the density from the previous two problems, and g is an exponential random variables with parameter $\lambda$. Recall the pdf of an exponential R.V:
+
+\[g(x) = \lambda e^{-\lambda x}\]
+
+Let's now define $h(x) = \frac{f(x)}{g(x)}$.
+
+\[h(x) = \frac{f(x)}{g(x)} = \frac{\frac{x}{\sigma^2}e^{-x^2/2\sigma^2}}{\lambda e^{-\lambda x}} = \frac{x}{\lambda\sigma^2}e^{\lambda x - x^2/2\sigma^2}\]
+
+The support here ranges from 0 to $\infty$, so our value c, must be the max value the function can take on between these two points. To find the max we can take the first derivative:
+
+\[h'(x) = \frac{1}{\lambda\sigma^2}e^{\lambda x - x^2/2\sigma^2} + (\lambda - \frac{x}{\sigma^2}) \frac{x}{\lambda\sigma^2}e^{\lambda x - x^2/2\sigma^2}\]
+
+\[0 = \frac{1}{\lambda\sigma^2}e^{\lambda x - x^2/2\sigma^2} + (\lambda - \frac{x}{\sigma^2}) \frac{x}{\lambda\sigma^2}e^{\lambda x - x^2/2\sigma^2}\]
+
+\[0 = 1 + (\lambda - \frac{x}{\sigma^2})x\]
+\[\frac{x^2}{\sigma^2} - \lambda x - 1 = 0\]
+
+We can use the quadratic formula to solve:
+
+\[x = \frac{\sigma(\sigma\lambda + \sqrt{\sigma^2\lambda^2+4})}{2}\]
+
+We can plug this value of x back in to get our value of c:
+
+\[c = h(\frac{\sigma(\sigma\lambda + \sqrt{\sigma^2\lambda^2+4})}{2})\]
+
 ## Part b
+
+```{r}
+n <- 1000
+counter <- 0
+found_count <- 0
+found_samps <- numeric(n)
+
+while (found_count < n) {
+ g_samp <- rexp(1)
+ g_yval <- runif(1, 0, dexp(g_samp))
+ if (g_yval <= f_dens(g_samp, sigma)) {
+   found_count <- found_count + 1
+   found_samps[found_count] <- g_samp
+ }
+ counter <- counter + 1
+}
+# number of iterations for 1000 samples
+print(counter)
+hist(found_samps, freq = FALSE)
+x <- seq(0, 10, 0.1)
+y <- f_dens(x, sigma)
+lines(x,y)
+```
