@@ -77,3 +77,67 @@ Out of 1000 simulations of sampling 100 values from the normal distribution with
 If the parameter $\sigma$ was not known, then we would have to use the student's t distribution to calculate the confidence interval.
 
 # Problem 2
+
+For this problem we will use the matrix $D$ from the previous homework.
+
+```{r}
+mat_v <- matrix(c(1, 2, 3, 2, 1, 0, 4, -4, 1, -1, 1, -1, 0, 3, 5), nrow = 3, ncol=5)
+
+l2_norm <- function(vec) {
+  sqrt(sum(vec^2))
+}
+
+num_cols <- dim(mat_v)[2]
+mat_d <- matrix(1:25, nrow = num_cols, ncol = num_cols)
+for (i in 1:num_cols) {
+  for (j in 1:num_cols) {
+    mat_d[i, j] <- l2_norm(mat_v[,i] - mat_v[,j])
+  }
+}
+mat_d
+```
+
+## Part a
+
+Create a matrix $\Sigma$ whose $ij^{th}$ element is $exp(-\tau D^2_{ij})$ for $\tau=\frac1{20}$.
+
+```{r}
+tau <- 1 / 20
+mat_sig <- matrix(1:25, nrow = num_cols, ncol = num_cols)
+mat_d_square <- mat_d %*% mat_d
+
+for (i in 1:num_cols) {
+  for (j in 1:num_cols) {
+    mat_sig[i, j] <- exp(-1 * tau * mat_d_square[i, j])
+  }
+}
+mat_sig
+```
+
+## Part b
+
+Compute the eigen-decomposition of $\Sigma$ and plot the eigen values (sorted from largest to smallest).
+
+```{r}
+decomp <- eigen(mat_sig)
+
+plot(decomp$values)
+```
+
+## Part c
+
+## Part d
+
+# Problem 3
+
+## Part a
+
+## Part b
+
+# Problem 4
+
+# Problem 5
+
+## Part a
+
+## Part b
