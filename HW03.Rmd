@@ -35,7 +35,7 @@ for (i in 1:length(n)) {
 
 Build a 95% confidence interval for each of these samples. Remember $\sigma$ is assumed to be known but not $\mu$.
 
-Recall that when $\sigma$ is known we can create our confidence interval for $\mu$ by using a transformation to the standard normal variable resulting in:
+Recall that when $\sigma$ is known we can create our confidence interval for $\mu$ by using the standard normal scalar resulting in:
 
 \[[\overline{X} \pm z_{\frac{\alpha}{2}}\frac{\sigma}{\sqrt{n}}]\]
 
@@ -50,6 +50,7 @@ for (i in 1:length(n)) {
   diff <- z_multi * sigma / sqrt(n[i])
   intervals[[i]] <- c(x_bar - diff, x_bar + diff)
 }
+print(intervals)
 ```
 
 ## Part c
@@ -135,6 +136,13 @@ frob_norm <- function(mat_input) {
 
 ```{r}
 epsilon <- 0.5
+
+# l = 0
+diag_entries <- numeric(length(decomp$values))
+sig_l <- decomp$vectors %*% diag(diag_entries) %*% t(decomp$vectors)
+mat_diff <- mat_sig - sig_l
+err_val <- frob_norm(mat_diff) / frob_norm(mat_sig)
+print(err_val)
 
 # the eigen values are the diagonal entries of lambda
 for (l in 1:length(decomp$values)) {
@@ -273,7 +281,7 @@ c <- h_dens((sigma * (sigma * lambda + sqrt(sigma^2 * lambda^2 + 4))) / 2)
 print(c)
 
 while (found_count < n) {
- g_samp <- rexp(1)
+ g_samp <- rexp(1, lambda)
  g_yval <- runif(1, 0, c *dexp(g_samp))
  if (g_yval <= f_dens(g_samp, sigma)) {
    found_count <- found_count + 1
@@ -286,7 +294,7 @@ print(counter)
 hist(found_samps, freq = FALSE)
 x <- seq(0, 10, 0.1)
 y <- f_dens(x, sigma)
-g <- c * dexp(x, lambda)
+# g <- c * dexp(x, lambda)
 lines(x,y)
-lines(x,g)
+# lines(x,g)
 ```
