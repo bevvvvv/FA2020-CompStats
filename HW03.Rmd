@@ -238,7 +238,7 @@ Let's now define $h(x) = \frac{f(x)}{g(x)}$.
 
 \[h(x) = \frac{f(x)}{g(x)} = \frac{\frac{x}{\sigma^2}e^{-x^2/2\sigma^2}}{\lambda e^{-\lambda x}} = \frac{x}{\lambda\sigma^2}e^{\lambda x - x^2/2\sigma^2}\]
 
-The support here ranges from 0 to $\infty$, so our value c, must be the max value the function can take on between these two points. To find the max we can take the first derivative:
+The support here ranges from 0 to $\infty$, so our value c, in order to minimize its value, must be the max of $h(x)$ between 0 and $\infty$. To find the max we can take the first derivative:
 
 \[h'(x) = \frac{1}{\lambda\sigma^2}e^{\lambda x - x^2/2\sigma^2} + (\lambda - \frac{x}{\sigma^2}) \frac{x}{\lambda\sigma^2}e^{\lambda x - x^2/2\sigma^2}\]
 
@@ -263,9 +263,18 @@ counter <- 0
 found_count <- 0
 found_samps <- numeric(n)
 
+lambda <- 1
+sigma <- sqrt(2)
+
+h_dens <- function(x) {
+  return(f_dens(x, sigma) / dexp(x, lambda))
+}
+c <- h_dens((sigma * (sigma * lambda + sqrt(sigma^2 * lambda^2 + 4))) / 2)
+print(c)
+
 while (found_count < n) {
  g_samp <- rexp(1)
- g_yval <- runif(1, 0, dexp(g_samp))
+ g_yval <- runif(1, 0, c *dexp(g_samp))
  if (g_yval <= f_dens(g_samp, sigma)) {
    found_count <- found_count + 1
    found_samps[found_count] <- g_samp
@@ -277,5 +286,7 @@ print(counter)
 hist(found_samps, freq = FALSE)
 x <- seq(0, 10, 0.1)
 y <- f_dens(x, sigma)
+g <- c * dexp(x, lambda)
 lines(x,y)
+lines(x,g)
 ```
