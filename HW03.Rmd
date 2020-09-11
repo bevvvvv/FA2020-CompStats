@@ -29,6 +29,10 @@ sigma <- 0.5
 for (i in 1:length(n)) {
   samples[[i]] <- rnorm(n[i], mean = mu, sd = sigma)
 }
+
+print(samples[[1]][0:5])
+print(samples[[2]][0:5])
+print(samples[[3]][0:5])
 ```
 
 ## Part b
@@ -121,6 +125,9 @@ Compute the eigen-decomposition of $\Sigma$ and plot the eigen values (sorted fr
 
 ```{r}
 decomp <- eigen(mat_sig)
+
+print(decomp$vectors)
+print(decomp$values)
 
 plot(decomp$values)
 ```
