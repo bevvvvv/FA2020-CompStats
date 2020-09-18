@@ -1,0 +1,60 @@
+---
+title: "Homework 04 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "09/19/2020"
+output:
+  pdf_document:
+    number_sections: false
+---
+
+```{r}
+set.seed(42)
+```
+
+# Problem 1
+
+Use R to simulate samples from a normal distribution. Let $Y$ be a random variable with chi-squared distribution with 5 degrees of freedom.
+
+## Part a
+
+Since we can only sample from the standard normal distribution, I would use the transformation that the Chi-square distribution is really the sum of squares of standard normal variables. The degrees of freedom is the number of standard normal random variables that make up the Chi-square distribution. In this case we would use the following transformation:
+
+\[\chi^2 = \Sigma_{i=1}^5Z_i^2\]
+
+## Part b
+
+Variance of $Y$:
+
+\[Var(Y) = (\int xf(x)dx)^2 - (\int x^2f(x)dx)\]
+
+Foruth moment of $Y$:
+
+\[\int x^4f(x)dx\]
+
+We can approximate all these integrals using Monte Carlo, where $h(x) =x^n$ (depending on the moment) and $f(x)$ is the density of $Y$ that we are sampling from. Therefore we can use our samples $X_i$ from the standard normal and transform them (5 for 5 degrees of freedom) into a chi-square sample $Y_i$. These samples can give us the value $\frac1n\Sigma_{i=1}^nh(Y_i) = \frac1n\Sigma_{i=1}^nY_i^k$, which can approximate the $k^{th}$ moment integral.
+
+## Part c
+
+Use R to estimate the above quantities using Monte Carlo with N = 10,000 samples and report the results.
+
+```{r}
+n <- 10000
+df <- 5
+norm_samples <- matrix(rnorm(n*df), nrow=n, ncol=df)
+norm_samples <- apply(norm_samples, c(1,2), function(x) {x^2})
+chi_samples <- rowSums(norm_samples)
+
+# variance
+second <- sum(chi_samples^2) / n
+expect_square <- (sum(chi_samples) / n) ^ 2
+variance <- second - expect_square
+print(variance)
+# compare approx with sd function
+print(sd(chi_samples)^2)
+
+# fourth moment
+fourth <- sum(chi_samples^4) / n
+print(fourth)
+```
+
+
