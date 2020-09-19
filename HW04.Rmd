@@ -4,7 +4,8 @@ author: "Joseph Sepich (jps6444)"
 date: "09/19/2020"
 output:
   pdf_document:
-    number_sections: false
+    number_sections: no
+  word_document: default
 ---
 
 ```{r}
@@ -57,4 +58,50 @@ fourth <- sum(chi_samples^4) / n
 print(fourth)
 ```
 
+# Problem 2
 
+## Part a
+
+Express the probability as an expectation and as an integral. For this we can use an indication function $g(x)$, which is 1 when $|\overline{X}_n - \mu| < \epsilon$ and 0 when it is not . ($|\overline{X}_n - \mu| \geq \epsilon$) We can use this indication function to express the probaility as an expectation:
+
+\[E[g(x)] = P(|\overline{X}_n - \mu| < \epsilon)\]
+
+We represent this as an integral (formula for finding the first moment) where $|\overline{X}_n - \mu|$ is the value we plug in for $x$ and $f(x)$ is the pdf of $|\overline{X}_n - \mu|$.
+
+\[E[g(x)] = \int g(x)dP(x) = \int g(x)f(x)dx\]
+
+Logically this makes sense as $P(|\overline{X}_n - \mu| < \epsilon)$ looks like the representation of a CDF, which is the integral we got.
+
+## Part b
+
+Here $I_n = \int h(x)f(x)dx$ where $h(x)$ is the indicator function that we described above. This integral is in the form of an expectation of the indicator function, therefore all we need to do is sample from this indicator function random variable and find that sample mean, which is the Monte Carlo integration process.
+
+## Part c
+
+```{r}
+epsilon <- 0.01
+m <- 1000
+n <- c(10, 100, 1000, 10000, 100000)
+result <- vector("numeric", length(n))
+
+mu <- 2
+sigma <- 1
+
+for (i in 1:length(n)) {
+  samples <- matrix(rnorm(n[i] * m, mu, sigma), nrow = m, ncol = n[i])
+  samples <- rowSums(samples)
+  x_n <- samples / n[i]
+  comp_val <- abs(x_n - mu)
+  result[i] <- sum(as.integer(comp_val < epsilon)) / m
+}
+
+plot(n, result, log='x')
+```
+
+## Part d
+
+As you can see in the plot above the correct behavior is shown. As the sample size of the sample mean gets larger, the expected value of our indicator function gets closer to 1, which means the numerical approximation of the $P(|\overline{X}_n - \mu| < \epsilon)$ gets closer to 1. This is exactly what the limit states in the weak law of large numbers.
+
+# Problem 3
+
+## Part a
