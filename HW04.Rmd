@@ -105,3 +105,56 @@ As you can see in the plot above the correct behavior is shown. As the sample si
 # Problem 3
 
 ## Part a
+
+```{r}
+beta <- c(1:7)
+mu <- 0
+sigma <- 1
+
+probs <- 1 - pnorm(beta, mu, sigma)
+
+plot(beta, probs, log="y")
+```
+
+It would not be very reasonable to sample from the normal distribution and only take these large samples. These samples occur so sparsely that you would have to sample an incredible number of times. For example, when beta is 1, you could only use 15.8% of the samples to try to estimate the value. For beta of 2, it would be 2.3% and with beta of 7 you would be lucky to find 1 in 1,000,000 to use to estimate the value.
+
+## Part b
+
+To find the pdf of $P(Z | Z > \beta)$ we will use the density version of Bayes theorem described where $S = Z > \beta$:
+
+\[f_{Z | Z > \beta}(x) = \frac{f_Z(x)P(Z > \beta |Z = x)}{1 -\Phi(\beta)} \]
+
+In the numerator we have $P(Z > \beta | Z = x)$, which is either 1 when $x > \beta$ or 0 otherwise, which makes sense, because you can't condition on the event that the value is greater than  $\beta$ unless it is. This gives use the density:
+
+\[f_{Z | Z > \beta}(x) = \frac{f_Z(x)}{1 -\Phi(\beta)}\]
+
+With the support $\beta < x < \infty$.
+
+We can use this to find expectation:
+
+\[\theta_{\beta} = \int_{\beta}^{\infty}xf_{Z | Z > \beta}(x)dx = \int_{\beta}^{\infty}\frac{xf_Z(x)}{1 -\Phi(\beta)}dx = \frac{1}{1-\Phi(\beta)}\int_{\beta}^{\infty}xf_Z(x)dx\]
+\[\theta_{\beta}= \frac{1}{1-\Phi(\beta)}\int_{\beta}^{\infty}\frac{x}{\sqrt{2\pi}}e^{-x^2/2}dx = \frac{-1}{\sqrt{2\pi}(1-\Phi(\beta))}(e^{-x^2/2})|_{\beta}^\infty\]
+\[\theta_{\beta} = \frac{e^{-\beta^2/2}}{\sqrt{2\pi}(1-\Phi(\beta))}\]
+
+## Part c
+
+We can use a rejection sampling approach to sample values from the distribution to estimate the expectation using the sample mean. The candidate density to be used will be that of the standard normal. Recall that we want to find a value that fits the following:
+
+\[\frac{f(x)}{g(x)} \leq c\]
+
+To do this we can define $h(x) = \frac{f(x)}{g(x)}$,
+
+\[h(x) = \frac{f(x)}{g(x)} = \frac{\frac{f_Z(x)}{1 -\Phi(\beta)}}{f_Z(x)} = \frac{1}{1-\Phi(\beta)}\]
+
+This means our scaling value $c =\frac{1}{1-\Phi(\beta)}$. For a value of $\beta = 6$ we find our probability of acceptance to be:
+
+```{r}
+beta <- 6
+c <- 1 / (1 - pnorm(6))
+1 / c
+```
+
+This makes the standard normal a very poor density to use since we would have to wait for about 1013594635 samples to get 1 accepted. This is so poor, since the support of the conditional density only exists in the area greater than $\beta$ while the standard normal support covers negative infinity to infinity. Since the values in the desired support will be drawn so rarely from the candidate function this makes it a very poor choice.
+
+
+
