@@ -325,5 +325,18 @@ This problem illustrated how crucial it is to pick a good candidate function. It
 
 # Problem 4
 
+## Part a
 
+\[\theta_\beta = \int h(x) f(x)dx= \int x f_{Z|Z>\beta}(x)dx\]
 
+Here $h(x) = x$ and $f(x) = f_{Z|Z>\beta}(x)$, the density we are looking at.
+
+## Part b
+
+\[\theta_\beta = \int \frac{h(x)f(x)}{g(x)}g(x) dx\]
+
+This integral as an expectation with respect to $g$ that is: $E[\frac{h(x)f(x)}{g(x)}]$
+
+## Part c
+
+To estimate $\theta_\beta$ with importance sampling I can use Monte Carlo integration to approximate this integral by using the sample mean of samples drawn from the candidate density $g(x)$. Samples drawn from $g(x)$ will be "weighted" according to the ratio $\frac{f(x)}{g(x)}$, so just like in the previous problem (3) it would be important to choose a candidate density $g(x)$ that is similar to our pdf $f(x)$. Candidate functions that behave more like $f(x)$ will produce a better estimate for the same sample size compared to a candidate function that does not match as well.
