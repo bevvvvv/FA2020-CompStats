@@ -1,0 +1,131 @@
+---
+title: "Midterm 01 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "09/21/2020"
+output:
+  pdf_document:
+    number_sections: no
+---
+
+# Problem 1 - Inverse Transform
+
+\[f(x) = Ke^{-\lambda|x|}, x\in R, \lambda > 0\]
+
+## Part a
+
+```{r}
+f_dens <- function(x, lambda) {
+    exp(-1 * lambda * abs(x))
+}
+
+lambda <- 1
+x <- seq(-3, 3, 0.01)
+
+plot(x, f_dens(x, lambda), "l")
+```
+
+The density is essentially an exponential density function that is mirrored over the y-axis. Logically this makes sense, since the exponent of e includes $|x|$.
+
+## Part b
+
+As I said in the previous part the function $f(x)$ is essentially mirrored over the y-axis. This implies that the same area should lie under the curve on each side, so if we "chop it in half" along the y-axis, then we only have to evaluate the integral from 0 to $\infty$ (or $-\infty$ to 0) and double the result to get the value of $\int_{\infty}^\infty f(x)dx$.
+
+## Part c
+
+To get $K$ we can evaluate the integral in the previous part and set it equal to 1. Note that we can ignore the absolute value function around x when only evaluating positive numbers.
+
+\[2\int_0^\infty f(x)dx = 2\int_0^\infty Ke^{-\lambda x}dx = \frac{-2K}{\lambda}(e^{-\lambda x})|_0^\infty = \frac{-2K}{\lambda}(0 - 1) = \frac{2K}{\lambda}\]
+
+\[\frac{2K}{\lambda} = 1\]
+\[2K = \lambda\]
+\[K = \frac{\lambda}2\]
+
+This value makes sense when you consider the regular exponential distribution pdf would have $K = \lambda$, so since we are going to have that distribution mirrored on both sides, we then only want half the area, so divide that value by two to get our actual value of $K = \frac{\lambda}{2}$.
+
+## Part d
+
+To compute the CDF let's first only consider the case where $x \geq 0$. Since we know our function is symmetry over the y-axis we can say that any value greater than 0 is half the area (of 1) plus whatever is under the curve past 0:
+
+\[F(a) = 0.5 + \int_0^a\frac{\lambda}2e^{-\lambda x}dx = 0.5 -\frac12(e^{-\lambda x}) |_0^a = 0.5-0.5(e^{-\lambda a} - 1) = 1-\frac{e^{-\lambda a}}{2}\]
+
+So for positive x we get $F(x) =  1-\frac{e^{-\lambda x}}{2}$, but what about negative x values. Since the density is symmetric we know that $F(x) = 1 - F(-x)$, so we can say for $x < 0$ we get:
+
+\[F(a)  = 1 - (0.5 + \int_0^a\frac{\lambda}2e^{-\lambda x}dx) = 0.5 - \int_0^a\frac{\lambda}2e^{-\lambda x}dx\]
+
+Basically we start at $\frac12$ and if x is positive we find the are to add to the right, and if it is negative, then we find the area we should subtract to the left (we is the same value just + or -).
+
+\[F(x) = 0.5 + sign(x)(0.5-\frac{e^{-\lambda |x|}}{2})\]
+
+## Part e
+
+We can clearly see the inflection point at $y = \frac12$ below, which will likely be helpful in part f.
+
+```{r}
+cdf <- function(x, lambda) {
+    sign_x <- x / abs(x)
+    0.5 + sign_x * (0.5 - 0.5 * exp(-1 * lambda * abs(x)))
+}
+
+lambda <- 1
+x <- seq(-3, 3, 0.01)
+
+plot(x, cdf(x, lambda), "l")
+```
+
+## Part f
+
+\[0.5 + sign(x)(0.5-\frac{e^{-\lambda |x|}}{2}) = y\]
+\[sign(x)(\frac12-\frac{e^{-\lambda |x|}}{2}) = y - \frac12\]
+
+Now we know from the CDF, plotted above, that the sign of $x$ is associated with values of $y$. Let's first look at the region $y < \frac12$:
+
+\[\frac{e^{-\lambda |x|}}{2} - \frac12 = y - \frac12\]
+\[\frac{e^{-\lambda |x|}}{2}= y\]
+\[-\lambda |x|= ln(2y)\]
+\[|x| = \frac{ln(2y)}{-\lambda}\]
+
+Recall that is the region where x should be negative. Since $\frac{ln(2y)}{-\lambda}$ is a positive value on the domain of $0 \leq y < \frac12$ we must multiply by one and we get:
+
+\[x = -1 * \frac{ln(2y)}{-\lambda}\]
+
+So when $y < \frac12$ we get $F^{-1}(y) = \frac{ln(2y)}{\lambda}$. How about $y \geq \frac12$:
+
+\[\frac12 -\frac{e^{-\lambda |x|}}{2}  = y - \frac12\]
+\[-\frac{e^{-\lambda |x|}}{2}  = y - 1\]
+\[\frac{e^{-\lambda |x|}}{2} = 1 - y\]
+\[-\lambda |x| = ln(2(1 - y))\]
+
+Again following the logic above, we know x must be positive, and for the domain of $y$, the function is already positive. This gives us.
+
+\[x = \frac{ln(2(1 - y))}{-\lambda}\]
+\[F^{-1}(y) = \frac{ln(2(1 - y))}{-\lambda}\]
+
+## Part g
+
+```{r}
+n <- 10000
+
+cdf_inverse <- function(y, lambda){
+    y_val <- y
+    y[y >= 0.5] <- 1 - y[y >= 0.5]
+    out <- log(2 * y) / (-1 * lambda)
+    out[y_val < 0.5] <- -1 * out[y_val < 0.5]
+    out
+}
+
+lambda <- 1
+samples <- runif(n)
+samples <- cdf_inverse(samples, lambda)
+
+hist(samples, freq=FALSE)
+
+x <- seq(-10, 10, 0.01)
+lines(x, f_dens(x, lambda))
+```
+
+# Problem 2 - Rejection Sampling
+
+
+
+
+
