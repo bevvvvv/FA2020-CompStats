@@ -44,7 +44,7 @@ This value makes sense when you consider the regular exponential distribution pd
 
 ## Part d
 
-To compute the CDF let's first only consider the case where $x \geq 0$. Since we know our function is symmetry over the y-axis we can say that any value greater than 0 is half the area (of 1) plus whatever is under the curve past 0:
+To compute the CDF let's first only consider the case where $x \geq 0$. Since we know our function is symmetric over the y-axis we can say that any value greater than 0 is half the area (of 1) plus whatever is under the curve past 0:
 
 \[F(a) = 0.5 + \int_0^a\frac{\lambda}2e^{-\lambda x}dx = 0.5 -\frac12(e^{-\lambda x}) |_0^a = 0.5-0.5(e^{-\lambda a} - 1) = 1-\frac{e^{-\lambda a}}{2}\]
 
@@ -52,7 +52,7 @@ So for positive x we get $F(x) =  1-\frac{e^{-\lambda x}}{2}$, but what about ne
 
 \[F(a)  = 1 - (0.5 + \int_0^a\frac{\lambda}2e^{-\lambda x}dx) = 0.5 - \int_0^a\frac{\lambda}2e^{-\lambda x}dx\]
 
-Basically we start at $\frac12$ and if x is positive we find the are to add to the right, and if it is negative, then we find the area we should subtract to the left (we is the same value just + or -).
+Basically we start at $\frac12$ and if x is positive we find the area to add to the right, and if it is negative, then we find the area we should subtract to the left (which is the same value just + or -).
 
 \[F(x) = 0.5 + sign(x)(0.5-\frac{e^{-\lambda |x|}}{2})\]
 
@@ -84,11 +84,11 @@ Now we know from the CDF, plotted above, that the sign of $x$ is associated with
 \[-\lambda |x|= ln(2y)\]
 \[|x| = \frac{ln(2y)}{-\lambda}\]
 
-Recall that is the region where x should be negative. Since $\frac{ln(2y)}{-\lambda}$ is a positive value on the domain of $0 \leq y < \frac12$ we must multiply by one and we get:
+Recall that is the region where x should be negative. Since $\frac{ln(2y)}{-\lambda}$ is a positive value on the domain of $0 \leq y < \frac12$ we must multiply by negative one and we get:
 
 \[x = -1 * \frac{ln(2y)}{-\lambda}\]
 
-So when $y < \frac12$ we get $F^{-1}(y) = \frac{ln(2y)}{\lambda}$. How about $y \geq \frac12$:
+So when $y < \frac12$ we get $F^{-1}(y) = -1*\frac{ln(2y)}{\lambda}$. How about $y \geq \frac12$:
 
 \[\frac12 -\frac{e^{-\lambda |x|}}{2}  = y - \frac12\]
 \[-\frac{e^{-\lambda |x|}}{2}  = y - 1\]
@@ -150,7 +150,7 @@ A cauchy distribution centered around 0 with rate 1 would be an okay candidate d
 \[0 = \frac{x^2\lambda}2 - x + \frac{\lambda}{2}\]
 \[x = \frac{-(-1)\pm\sqrt{1-4(\lambda/2)^2}}{\lambda} = \frac{1+\sqrt{1-\lambda^2}}{\lambda}\]
 
-Since $\lambda > 0$ it the number is imaginary, so once again we follow the same logic from part c. There is no scaling factor large enough to enable rejection sampling, because the tail decay of the cauchy distribution is too fast compared to that of the exponential distribution.
+Since $\lambda > 0$ the x for the max value of c here is imaginary, so once again we follow the same logic from part c. There is no scaling factor large enough to enable rejection sampling, because the tail decay of the cauchy distribution is too fast compared to that of the exponential distribution.
 
 # Problem 3 - Importance Sampling
 
@@ -192,8 +192,6 @@ theta_actual <- exp(-1 * beta^2 / 2) / (sqrt(2 * pi)*(1-pnorm(beta)))
 for (i in 1:length(mu)) {
     theta_est <- sample_H(n, beta, mu[i])
     err[i] <- (theta_est - theta_actual)^2
-    print(err[i])
-    print(mu[i])
 }
 
 plot(mu, err)
