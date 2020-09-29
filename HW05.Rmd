@@ -1,0 +1,49 @@
+---
+title: "Homework 05 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "10/04/2020"
+output:
+  pdf_document:
+    number_sections: no
+---
+
+# Problem 1
+
+```{r}
+# load dataset
+scores <- data.matrix(read.csv('./data/score.csv'))
+scores[0:10,]
+```
+
+Adjust the scores by dropping the lowest.
+
+```{r}
+adjusted_scores <- t(as.matrix(apply(scores, 1, function(x) x[-(match(min(x), x))])))
+adjusted_scores[0:10,]
+```
+
+## Part a
+
+```{r}
+averages <- rowMeans(adjusted_scores)
+sample_avg <- mean(averages)
+hist(averages, main = "Adjusted Grade Averages")
+abline(v=sample_avg, col="red", lw=3)
+```
+
+## Part b
+
+You could express $\theta$ as an expectation of an indicator function: $E[1_{X>C}(x)] = P(X > C) = \theta$. This value can be approximated by sampling from the pdf of $X$ and you have a 0 or 1 depending on whether it is greater than $C$ or not. You would divide the sum of samples (0 or 1) by N to get the expected value of the indicator, which is also the approximation of the probability $P(X > C)$. In this specific problem we are sampling from the student's average adjusted scores. If the average adjusted score we randomly select is greater than $C$ the indicator is a 1, otherwise it is a zero.
+
+## Part c
+
+```{r}
+C <- 70
+
+```
+
+
+
+
+
+
