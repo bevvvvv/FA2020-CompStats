@@ -7,6 +7,10 @@ output:
     number_sections: no
 ---
 
+```{r}
+set.seed(42)
+```
+
 # Problem 1
 
 ```{r}
@@ -27,20 +31,85 @@ adjusted_scores[0:10,]
 ```{r}
 averages <- rowMeans(adjusted_scores)
 sample_avg <- mean(averages)
-hist(averages, main = "Adjusted Grade Averages")
+hist(averages, freq=FALSE, main = "Adjusted Grade Averages")
 abline(v=sample_avg, col="red", lw=3)
 ```
 
 ## Part b
 
-You could express $\theta$ as an expectation of an indicator function: $E[1_{X>C}(x)] = P(X > C) = \theta$. This value can be approximated by sampling from the pdf of $X$ and you have a 0 or 1 depending on whether it is greater than $C$ or not. You would divide the sum of samples (0 or 1) by N to get the expected value of the indicator, which is also the approximation of the probability $P(X > C)$. In this specific problem we are sampling from the student's average adjusted scores. If the average adjusted score we randomly select is greater than $C$ the indicator is a 1, otherwise it is a zero.
+You could express $\theta$ as an expectation of an indicator function: $E[1_{X>C}(x)] = P(X > C) = \theta$. This value can be approximated by sampling from $X$ and you obtain a 0 or 1 depending on whether it is greater than $C$ or not. You would divide the sum of samples (0 or 1) by N to get the expected value of the indicator, which is also the approximation of the probability $P(X > C)$. In this specific problem we are sampling from the student's average adjusted scores. If the average adjusted score we randomly select is greater than $C$ the indicator is a 1, otherwise it is a zero.
 
 ## Part c
 
 ```{r}
 C <- 70
-
+n <- 10000
+# sample from data (X)
+samples <- sample(averages, n, replace=TRUE)
+# apply indicator function
+samples[samples <= C] <- 0
+samples[samples > C] <- 1
+# expectation of indicator
+theta_hat <- mean(samples)
+print(theta_hat)
 ```
+
+The Monte Carlo estimate states that $P(X > 70) \approx 0.1961$, so about 19.61% of students have an average adjust test score about 70%.
+
+## Part d
+
+The histogram looks similar to a normal distribution. Often grades of students fall upon a normal distribution and instructors usually use a normal distribution when grading on a curve. For this reason we will use a normal distribution for our parametric bootstrap.
+
+## Part e
+
+```{r}
+k <- 10000
+n <- length(averages)
+
+# parameter estimates
+mu_hat <- mean(averages)
+sigma_hat <- sd(averages)
+
+# parametric bootstrap from estimated distribution
+boot_samples <- matrix(rnorm(k*n, mean=mu_hat, sd=sigma_hat), nrow=k)
+
+# apply indicator function
+boot_samples <- t(as.matrix(apply(boot_samples, c(1,2), function(x) if (x <= C) {0} else {1})))
+theta_est <- rowMeans(boot_samples)
+
+hist(theta_est, freq = FALSE, main="Bootstrapped Theta Estimates", xlim = c(theta_hat - 0.005, max(theta_est)))
+abline(v=theta_hat, col="red", lw=3)
+```
+
+This results makes sense due to our choice of a normal distribution. The histogram of the actual test scores shows fewer students past 70 then you would expect if you traced a normal distribution over it.
+
+## Part f
+
+```{r}
+k <- 10000
+n <- length(averages)
+
+# parameter estimates
+mu_hat <- mean(averages)
+sigma_hat <- sd(averages)
+
+# parametric bootstrap from estimated distribution
+boot_samples <- matrix(sample(averages, k*n, replace=TRUE), nrow=k)
+
+# apply indicator function
+boot_samples <- t(as.matrix(apply(boot_samples, c(1,2), function(x) if (x <= C) {0} else {1})))
+theta_est <- rowMeans(boot_samples)
+
+hist(theta_est, freq = FALSE, main="Bootstrapped Theta Estimates")
+abline(v=theta_hat, col="red", lw=3)
+```
+
+
+
+
+
+
+
 
 
 
