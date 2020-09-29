@@ -89,11 +89,7 @@ This results makes sense due to our choice of a normal distribution. The histogr
 k <- 10000
 n <- length(averages)
 
-# parameter estimates
-mu_hat <- mean(averages)
-sigma_hat <- sd(averages)
-
-# parametric bootstrap from estimated distribution
+# non-parametric sampling procedure
 boot_samples <- matrix(sample(averages, k*n, replace=TRUE), nrow=k)
 
 # apply indicator function
@@ -104,12 +100,127 @@ hist(theta_est, freq = FALSE, main="Bootstrapped Theta Estimates")
 abline(v=theta_hat, col="red", lw=3)
 ```
 
+# Problem 2
+
+## Part a
+
+Again to use Monte Carlo methods to approximate $P(l \leq \hat\theta \leq u)$ we can use an indicator function $1_{X \in[l,u]}(\hat\theta)$. We need to find the values $l$ and $u$ that satisfy $E[1_{\hat\theta \in[l,u]}(x)] = 1-\alpha$. This gives us the following sum $\frac{1}{M}\Sigma_{i=1}^M1_{\hat\theta \in[l,u]}\hat\theta_i$. We want to find an $l$ and $u$ that makes the value of this sum equal to $1-\alpha$. All we are doing with this sum is finding the percentage of our bootstrapped estimates that lie in the interval between the lower bound and upper bound. For a 95% confidence interval we would want to find bounds where this sum evaluates to 0.95.
+
+## Part b
+
+We can use the quantile function in R to find a $1 -\alpha$ confidence interval by first obtaining the bootstrapped estimates for $\hat\theta$ and finding the $\alpha/2$ and $1-\alpha/2$ quantiles for that vector of bootstrapped estimates of $\hat\theta$. Getting these two quantiles gives us the lower and upper bounds for an interval in the middle that contains $1-\alpha$ percent of the bootstrapped estimates, which is exactly the value we stated we wanted in the previous part.
+
+## Part c
+
+```{r}
+alpha <- 0.05
+
+# copied and pasted procedure
+k <- 10000
+n <- length(averages)
+
+# parameter estimates
+mu_hat <- mean(averages)
+sigma_hat <- sd(averages)
+
+# parametric bootstrap from estimated distribution
+boot_samples <- matrix(rnorm(k*n, mean=mu_hat, sd=sigma_hat), nrow=k)
+
+# apply indicator function
+boot_samples <- t(as.matrix(apply(boot_samples, c(1,2), function(x) if (x <= C) {0} else {1})))
+theta_est <- rowMeans(boot_samples)
+
+bounds <- quantile(theta_est,probs=c(alpha/2,(1-alpha/2)))
+hist(theta_est, freq = FALSE, main="Theta Hat Confidence Interval")
+abline(v=bounds, col="red", lw=3)
+```
+
+```{r}
+print(bounds)
+```
+
+## Part d
+
+```{r}
+# copy and pasted procedure
+k <- 10000
+n <- length(averages)
+
+# non-parametric sampling procedure
+boot_samples <- matrix(sample(averages, k*n, replace=TRUE), nrow=k)
+
+# apply indicator function
+boot_samples <- t(as.matrix(apply(boot_samples, c(1,2), function(x) if (x <= C) {0} else {1})))
+theta_est <- rowMeans(boot_samples)
+
+bounds <- quantile(theta_est,probs=c(alpha/2,(1-alpha/2)))
+hist(theta_est, freq = FALSE, main="Bootstrapped Theta Estimates")
+abline(v=bounds, col="red", lw=3)
+```
+
+```{r}
+print(bounds)
+```
+
+# Problem 3
+
+We want to test to see if exactly half to students have at least an average score of $C = 70$.
+
+## Part a
+
+Null Hypothesis ($H_0$) would be $P(X\geq C)_0=p_0 = 0.5$. The alternative hypothesis ($H_A$) would be $p(X \geq C)_A = p_A \neq 0.5$
 
 
+## Part b
 
+Here we can use a test statistic $T := |\hat{p} - p_0|$, which makes our observed test statistic $T_{obs} := |\hat{p}_{obs} - p_0|$. This would give us an "extreme set" of any value of that falls within the set $[T_{obs},\infty)$.
 
+## Part c
 
+The p-value is an estimate of how often we expect to see values of $T := |\hat{p} - p_0|$ in our extreme set given a distribution with our null hypothesis. Translated to probability our p-value is $P(T \geq T_{obs})$. We can see that we can translate this probability into an expectation for estimation with Monte Carlo: $E[1_{T \in[T_{obs},\infty]}(T)]=P(T \geq T_{obs})$. Therefore all we have to do is use a bootstrap to obtain various test statistics $T$, then apply the indicator function to them to determine if they are in the extreme set. We then obtain our p-value by finding the saple mean of this indicator function result.
 
+## Part d
+
+Since our null hypothesis gives us a parameter $p_0$ that represents a proportion, we can sample from the binomial distribution with parameters n and p under the null where n is our sample size and p is the value $p_0$ dictated by the null hypothesis.
+
+## Part e
+
+```{r}
+k <- 10000
+n <- length(averages)
+p_null <- 0.5
+
+# sample theta hat from null
+theta_null <- rbinom(k, n, p_null) / n
+T_null <- abs(theta_null - p_null)
+
+# observed T
+# apply indicator to averages
+samples <- averages
+samples[samples < C] <- 0
+samples[samples >= C] <- 1
+# expectation of indicator
+theta_hat <- mean(samples)
+T_obs <- abs(theta_hat - p_null)
+
+hist(T_null, freq = FALSE, main="noice", xlim = c(0, T_obs))
+abline(v=T_obs, col='red', lw=3)
+```
+
+## Part f
+
+```{r}
+T_null[T_null < T_obs] <- 0
+T_null[T_null >= T_obs] <- 1
+p_val <- mean(T_null)
+print(p_val)
+```
+
+This p-value represents the percentage of test statistics under the null hypothesis that were as extreme as the observed or more extreme. Since none were as extreme as the observed test statistic we get a p-value of zero. This gives us enough evidence to reject the null hypothesis that half of the students have an average test score at least 70 or higher.
+
+## Part g
+
+To sample under the null hypothesis we can perform a transformation in the sampling procedure. When doing the non-parametric bootstrap on the averages we expect to get a certain sample mean usually of $\overline{X}$. If we subtract this sample mean from the samples we take we would expect to get 0 on average: $E[X - \overline{X}] = \frac1n\Sigma (X_i - \overline {X}) = \overline {X} - \frac{n}{n}\overline {X} = 0$. Therefore we can bootstrap under the null by sampling from our observations with replace, but for each sample we also add the null mean and subtract the sample mean: $y_i = x_i - \overline {X} + \mu_0$.
 
 
 
