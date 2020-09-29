@@ -5,7 +5,6 @@ date: "09/19/2020"
 output:
   pdf_document:
     number_sections: no
-  word_document: default
 ---
 
 ```{r}
