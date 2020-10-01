@@ -178,11 +178,9 @@ The p-value is an estimate of how often we expect to see values of $T := |\hat\t
 
 ## Part d
 
-Since our null hypothesis gives us a parameter $\theta_0$ that represents a proportion, we can sample from the binomial distribution with parameters n and p under the null where n is our sample size and p is the value $p_0$ dictated by the null hypothesis.
+Our null hypothesis revolves around the parameter $\theta_0$, which is the proportion of student average test scores that are at least 70. We can use a binomial distribution where n is the sample size of test scores and p is the value $\theta_0 = 0.5$. This binomial distribution will represent if we truly have the parameter that half student scores are at least 70, then how many students do we expect to see with at least 70 (denoted as a success).
 
 ## Part e
-
-TODO
 
 ```{r}
 k <- 10000
@@ -190,7 +188,10 @@ n <- length(averages)
 p_null <- 0.5
 
 # sample theta hat from null
-theta_null <- rbinom(k, n, p_null) / n
+# number of students (out of n) with at least of 70 for k trials
+theta_null <- rbinom(k, n, p_null)
+# percentage of students (a prob) with at least 70 in each k trials
+theta_null <- theta_null / n
 T_null <- abs(theta_null - p_null)
 
 # observed T
@@ -199,7 +200,7 @@ T_null <- abs(theta_null - p_null)
 theta_hat <- mean(averages >= C)
 T_obs <- abs(theta_hat - p_null)
 
-hist(T_null, freq = FALSE, main="noice", xlim = c(0, T_obs))
+hist(T_null, freq = FALSE, main="Hypothesis Test", xlim = c(0, T_obs))
 abline(v=T_obs, col='red', lw=3)
 ```
 
@@ -214,9 +215,7 @@ This p-value represents the percentage of test statistics under the null hypothe
 
 ## Part g
 
-TODO
-
-To sample under the null hypothesis we can perform a transformation in the sampling procedure. When doing the non-parametric bootstrap on the averages we expect to get a certain sample mean usually of $\overline{X}$. If we subtract this sample mean from the samples we take we would expect to get 0 on average: $E[X - \overline{X}] = \frac1n\Sigma (X_i - \overline {X}) = \overline {X} - \frac{n}{n}\overline {X} = 0$. Therefore we can bootstrap under the null by sampling from our observations with replace, but for each sample we also add the null mean and subtract the sample mean: $y_i = x_i - \overline {X} + \mu_0$.
+In the parametric hypothesis test I sampled from a binomial distribution to get the number of students that were successful at getting an average score of at least 70. All we have to do to turn this into a non-parametric test is sample from the dataset to get this value rather than the binomial distribution and then perform a transformation upon it. We know what to expect from sampling via $\theta_{obs}$. If we transform each sample by applying $y_i = x_i - \theta_{obs} + \theta_0$ where x_i is the percentage of students over C (70). This follows the idea that if we subtract the sample mean from the samples we take we would expect to get 0 on average: $E[X - \overline{X}] = \frac1n\Sigma (X_i - \overline {X}) = \overline {X} - \frac{n}{n}\overline {X} = 0$. Therefore we can bootstrap under the null by sampling from our observations with replacement, but for each sample we also add the null mean and subtract the sample mean: $y_i = x_i - \overline {X} + \mu_0$.
 
 
 
