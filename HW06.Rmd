@@ -1,0 +1,27 @@
+---
+title: "Homework 06 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "10/11/2020"
+output:
+  pdf_document:
+    number_sections: no
+---
+
+```{r}
+set.seed(42)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
