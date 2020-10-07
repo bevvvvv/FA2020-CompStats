@@ -11,9 +11,56 @@ output:
 set.seed(42)
 ```
 
+```{r}
+diet_df <- read.csv('./data/diet.csv')
+diet_df <- diet_df[complete.cases(diet_df),]
+head(diet_df)
+```
 
+# Problem 1
 
+Set a hypothesis testing scenario where you want to test if fat and fibre consumption are correlated. Explicitly say what the null and alternative hypotheses are, as well as the test statistic.
 
+Null Hypothesis:
+
+\[H_0:\rho = 0\]
+
+Alternative Hypothesis:
+
+\[H_A:\rho \neq 0\]
+
+We can use the following test statistic:
+
+\[T = |r - \rho_0| = |r|\]
+
+This test statistic we are using here translates to the absolute value of the sample correlation coefficient between fat and fibre. Our null hypothesis states that $\rho_0$ is zero, which is why we only need $|r|$. R has the built in cor command that will calculate $r$ for us: `cor(diet_df$fat, diet_df$fibre)`. The default is pearson's correlation coefficient.
+
+# Problem 2
+
+```{r}
+K <- 1000
+
+T_obs <- abs(cor(diet_df$fat, diet_df$fibre))
+
+T_perm <- vector('numeric', K)
+temp_df <- diet_df
+for (i in 1:K) {
+    temp_df$fibre <- sample(diet_df$fibre)
+    T_perm[i] <- abs(cor(temp_df$fat, temp_df$fibre))
+}
+
+x_end <- max(c(T_obs, max(T_perm)))
+hist(T_perm, freq=FALSE, xlim = c(0,x_end))
+abline(v=T_obs, col='red')
+```
+
+# Problem 3
+
+The approximate p-value is zero:
+
+```{r}
+print(mean(T_perm >= T_obs))
+```
 
 
 
