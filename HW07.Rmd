@@ -131,16 +131,9 @@ points(best_points, L(best_points))
 ```
 
 ```{r}
-xpts <- rep(1:length(best_points),each=dim)
-ypts <- vector(mode="numeric",length=length(xpts))
-for (i in 1:length(xpts)) {
-    if (i %% 2 == 0) {
-        ypts[i] <- all_points[i/2,2]
-    } else {
-        ypts[i] <- all_points[floor(i/2)+1,1]
-    }
-}
-plot(xpts, ypts)
+xpts <- 1:length(best_points)
+plot(xpts, all_points[,1])
+points(xpts, all_points[,2])
 ```
 
 ## Part e
@@ -171,24 +164,159 @@ points(best_points, L(best_points))
 ```
 
 ```{r}
-xpts <- rep(1:length(best_points),each=dim)
-ypts <- vector(mode="numeric",length=length(xpts))
-for (i in 1:length(xpts)) {
-    if (i %% 2 == 0) {
-        ypts[i] <- all_points[i/2,2]
-    } else {
-        ypts[i] <- all_points[floor(i/2)+1,1]
-    }
-}
-plot(xpts, ypts)
+xpts <- 1:length(best_points)
+plot(xpts, all_points[,1])
+points(xpts, all_points[,2])
 ```
 
 The results are what you would expect. The algorithm got closer and closer the the minimum it was near. In this part where we started on the far right of the function we go the suboptimal minimum, because the algorithm doesn't reflect/expand far enough to overcome this locality. We can see it starts to go to the other side of the local minimum here on step 3, but the loss function increases so the points come back toward the actual minimum.
 
 # Problem 2
 
+For Newton's Method we need the derivative of our loss function as well:
+
+```{r}
+L_prime <- function(x) {
+    4*x^3 - 14*3*x^2 + 120*x - 70
+}
+
+L_prime_2 <- function(x) {
+    12*x^2 - 14*6*x + 120
+}
+```
+
+If we plot this function we can see the two minima (one local, one global) where the derivative is equal to zero twice.
+
+```{r}
+# plot function
+x <- seq(-1, 8, 0.001)
+plot(x, L_prime(x), type="l")
+```
+
+```{r}
+example_newton <- function(init_area=c(0, 2), return_points=FALSE) {
+    # termination criteria
+    diff_threshold <- 0.01
+    
+    point <- runif(1, init_area[1], init_area[2])
+    point_mat <- NA
+    
+    diff <- 1
+    iter <- 1
+    while(diff > diff_threshold) {
+        # store iteration
+          if (return_points) {
+              if (iter == 1) {
+                  points <- c(point)
+                  point_mat <- matrix(points, nrow=1, ncol=1)
+              } else {
+                  points <- c(point)
+                  point_mat <- rbind(point_mat, matrix(points, nrow=1, ncol=1))
+              }
+          }
+        
+        point_new <- point - L_prime(point) / L_prime_2(point)
+        diff <- abs(L(point) - L(point_new))
+        point <- point_new
+        iter <- iter + 1
+    }
+    if (return_points) {
+        return(point_mat)
+    }
+    return(point)
+}
+```
+
+```{r}
+print(example_newton())
+plot(x, L(x), type="l")
+abline(v=example_nm(), col="red")
+```
+
+```{r}
+my_loss <- function(x) {
+    L(x)[1]
+}
+val <- optim(par = c(0, 2), fn = my_loss, method="Nelder-Mead")$par[1]
+print(val)
+plot(x, L(x), type="l")
+abline(v=val, col="red")
+```
+
+```{r}
+all_points <- example_newton(return_points = TRUE)
+best_points <- all_points[,1]
+print(best_points)
+x_sub <- seq(-6, 2, 0.01)
+plot(x_sub, L(x_sub), type="l")
+points(best_points, L(best_points))
+```
+
+```{r}
+xpts <- 1:length(best_points)
+ypts <- best_points
+plot(xpts, ypts)
+```
+
+```{r}
+print(example_newton(init_area=c(6,8)))
+plot(x, L(x), type="l")
+abline(v=example_newton(init_area=c(6,8)), col="red")
+```
+
+```{r}
+my_loss <- function(x) {
+    L(x)[1]
+}
+val <- optim(par = c(6, 8), fn = my_loss, method="Nelder-Mead")$par[1]
+print(val)
+plot(x, L(x), type="l")
+abline(v=val, col="red")
+```
+
+```{r}
+all_points <- example_newton(init_area = c(6,8), return_points = TRUE)
+best_points <- all_points[,1]
+print(best_points)
+x_sub <- seq(5.5, 7, 0.01)
+plot(x_sub, L(x_sub), type="l")
+points(best_points, L(best_points))
+```
+
+```{r}
+xpts <- 1:length(best_points)
+ypts <- best_points
+plot(xpts, ypts)
+```
+
+Again the results here with Newton's method are similar to Nelder Mead and what you expect. Unlike Nelder-Mead, Newton's method's convergence shows the effect of using the derivative of the function where it slows down in the amount it changes as it gets closer and closer to the extrema it is finding, whereas Nelder Mead is able to reflect/move right by the extrema to the other side of it. This can help in Newton's method by likely being faster than Nelder Mead, but if Nelder Mead has the right settings it could occasionally jump over to the optimum from the sub-optimum.
+
 # Problem 3
 
+```{r}
+N <- 300
+beta_1 <- 1
+beta_2 <- 0.1
+
+Z_1 <- function(n) {
+  return(rnorm(n, -1, 0.5))
+}
+Z_2 <- function(n) {
+  return(rnorm(n, 1, 0.5))
+}
+error <- function(n) {
+  return(rnorm(n, 0, 0.1))
+}
+
+
+Y <- beta_1*Z_1(N) + beta_2*Z_2(N) + error(N)
+```
+
+```{r}
+L <- function(beta=c(1,0.1)) {
+  mean(Y )
+}
+```
 
 
 
