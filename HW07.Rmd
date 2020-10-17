@@ -57,7 +57,7 @@ example_nm <- function(par=c(0, 2), fn = L, return_points=FALSE) {
     iter <- 1
     while(sd(points) >= sd_threshold & iter <= max_term) {
         # Order points
-        points <- points[order(L(points))]
+        points <- points[order(fn(points))]
         if (return_points) {
             if (iter == 1) {
                 point_mat <- matrix(points, nrow=1, ncol=dim)
@@ -70,22 +70,22 @@ example_nm <- function(par=c(0, 2), fn = L, return_points=FALSE) {
         centroid <- points[1:dim-1] / (dim-1)
         # Reflect about centroid
         reflected_point <- centroid +  alpha * (centroid - points[dim])
-        val_r <- L(reflected_point)
+        val_r <- fn(reflected_point)
         # don't need to check reflected
         # criteria; if better than x_n but not better than x_1; isn't possible
         # since x_1 = x_n here
         
         # Expand step
-        if (val_r < L(points[1])) {
+        if (val_r < fn(points[1])) {
             expanded <- centroid + gamma * (reflected_point - centroid)
-            if (L(expanded) < val_r) {
+            if (fn(expanded) < val_r) {
                 points[dim] <- expanded
             } else {
                 points[dim] <- reflected_point
             }
         } else {
             contracted <- centroid + rho * (reflected_point - centroid)
-            if (L(contracted) < L(points[dim])) {
+            if (fn(contracted) < fn(points[dim])) {
                 # contract
                 points[dim] <- contracted
             } else {
@@ -308,15 +308,86 @@ error <- function(n) {
   return(rnorm(n, 0, 0.1))
 }
 
-
-Y <- beta_1*Z_1(N) + beta_2*Z_2(N) + error(N)
+Z_1_vals <- Z_1(N)
+Z_2_vals <- Z_2(N)
+err_vals <- error(N)
+Y <- beta_1*Z_1_vals + beta_2*Z_2_vals + err_vals
 ```
 
 ```{r}
-L <- function(beta=c(1,0.1)) {
-  mean(Y )
+L <- function(beta=c(1,0.1),lambda=1) {
+  inner <- Y - beta[1]*Z_1_vals - beta[2]*Z_2_vals
+  mean(inner^2) + abs(beta[1])*lambda + abs(beta[2])*lambda
 }
 ```
 
+```{r}
+nm_reg <- function(par=c(0, 1), fn=L, lambda=1, return_points=FALSE) {
+    # parameters
+    alpha <- 1
+    gamma <- 2
+    rho <- 0.5
+    sigma <- 0.5
+    
+    # termination criteria
+    max_term <- 100
+    sd_threshold <- 0.01
+    
+    dim <- 3
+    points_x <- runif(dim, min=par[1], max=par[2])
+    points_y <- runif(dim, min=par[1], max=par[2])
+    
+    point_mat <- NA
+    
+    ## UPDATE BELOW
+    
+    iter <- 1
+    while(sd(points) >= sd_threshold & iter <= max_term) {
+        # Order points
+        points <- points[order(fn(points))]
+        if (return_points) {
+            if (iter == 1) {
+                point_mat <- matrix(points, nrow=1, ncol=dim)
+            } else {
+                point_mat <- rbind(point_mat, matrix(points, nrow=1, ncol=dim))
+            }
+        }
+        
+        # Compute centroid - this is merely the first point (2 points only)
+        centroid <- points[1:dim-1] / (dim-1)
+        # Reflect about centroid
+        reflected_point <- centroid +  alpha * (centroid - points[dim])
+        val_r <- fn(reflected_point)
+        # don't need to check reflected
+        # criteria; if better than x_n but not better than x_1; isn't possible
+        # since x_1 = x_n here
+        
+        # Expand step
+        if (val_r < fn(points[1])) {
+            expanded <- centroid + gamma * (reflected_point - centroid)
+            if (fn(expanded) < val_r) {
+                points[dim] <- expanded
+            } else {
+                points[dim] <- reflected_point
+            }
+        } else {
+            contracted <- centroid + rho * (reflected_point - centroid)
+            if (fn(contracted) < fn(points[dim])) {
+                # contract
+                points[dim] <- contracted
+            } else {
+                # shrink
+                points <- points[1] + sigma * (points - points[1])
+            }
+        }
+        # next iteration
+        iter <- iter + 1
+    }
+    if (return_points) {
+        return(point_mat)
+    }
+    return(points[1])
+}
+```
 
 
