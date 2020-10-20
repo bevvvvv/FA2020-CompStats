@@ -171,9 +171,48 @@ In the first portion, from steps 1 through about 5, the step is almost always a 
 
 # Problem 2 Permutation Test
 
+```{r}
+weather <- read.csv('./data/Szeged_Weather_Summary.csv')
+weather[1:5,]
+```
+
 ## Part a
 
+Null Hypothesis:
+
+\[H_0:\rho = 0\]
+
+Alternative Hypothesis:
+
+\[H_A:\rho \neq 0\]
+
+We can use the following test statistic:
+
+\[T = |r - \rho_0| = |r|\]
+
+This test statistic we are using here translates to the absolute value of the sample correlation coefficient between Temperature and Humidity. Our null hypothesis states that $\rho_0$ is zero, which is why we only need $|r|$. Our extreme set would be test statisics that are greater than our observed test statistic $T_{obs}$ where $T_{obs} = |r_{obs}|$. Explicitly our extreme set is $T \geq T_{obs}$. We can calculate our P value by calculating the proportion of test statistics that fall within our extreme set.
+
 ## Part b
+
+```{r}
+K <- 10000
+
+T_obs <- abs(cor(weather$Temperature, weather$Humid))
+
+T_perm <- vector('numeric', K)
+temp_df <- weather
+for (i in 1:K) {
+    temp_df$Humid <- sample(weather$Humid)
+    T_perm[i] <- abs(cor(temp_df$Temperature, temp_df$Humid))
+}
+
+x_end <- max(c(T_obs, max(T_perm)))
+hist(T_perm, freq=FALSE, xlim = c(0,x_end))
+abline(v=T_obs, col='red')
+print(mean(T_perm >= T_obs))
+```
+
+We would reject the null hypothesis here with a p-value of zero in our permutation test.
 
 # Problem 3 Cross-Validation
 
