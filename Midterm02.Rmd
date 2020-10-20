@@ -197,13 +197,13 @@ This test statistic we are using here translates to the absolute value of the sa
 ```{r}
 K <- 10000
 
-T_obs <- abs(cor(weather$Temperature, weather$Humid))
+T_obs <- abs(cor(weather$Temperature, weather$Humidity))
 
 T_perm <- vector('numeric', K)
 temp_df <- weather
 for (i in 1:K) {
-    temp_df$Humid <- sample(weather$Humid)
-    T_perm[i] <- abs(cor(temp_df$Temperature, temp_df$Humid))
+    temp_df$Humidity <- sample(weather$Humidity)
+    T_perm[i] <- abs(cor(temp_df$Temperature, temp_df$Humidity))
 }
 
 x_end <- max(c(T_obs, max(T_perm)))
@@ -215,6 +215,38 @@ print(mean(T_perm >= T_obs))
 We would reject the null hypothesis here with a p-value of zero in our permutation test.
 
 # Problem 3 Cross-Validation
+
+```{r}
+# size of data
+n <- nrow(weather)
+# error caches
+error1 <- numeric(n)
+error2 <- numeric(n)
+error3 <- numeric(n)
+
+for (i in 1:n) {
+    # create models
+    m1_i <- lm(Temperature~Humidity, data=weather)
+    m2_i <- lm(Temperature~WindSpeed, data=weather)
+    m3_i <- lm(Temperature~Humidity+WindSpeed, data=weather)
+    
+    # predicted values
+    y1 <- predict(m1_i, weather[i,])
+    y2 <- predict(m2_i, weather[i,])
+    y3 <- predict(m3_i, weather[i,])
+    
+    # compute squared error
+    error1[i] <- (weather$Temperature[i]- y1)^2
+    error2[i] <- (weather$Temperature[i]- y2)^2
+    error3[i] <- (weather$Temperature[i]- y3)^2
+}
+
+print(mean(error1))
+print(mean(error2))
+print(mean(error3))
+```
+
+The linear regression model that had the minimal error through the leave-one-out cross-validation was using both Humidity and WindSpeed to predict Temperature. Since the model with just Humidity did much better than just WindSpeed we can also infer that Humidity is likely more correlated with Temperature than WindSpeed is.
 
 # Problem 4 Bootstrap and Regression
 
