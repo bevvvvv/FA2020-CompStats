@@ -1,0 +1,46 @@
+---
+title: "Midterm 02 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "10/23/2020"
+output:
+  pdf_document:
+    number_sections: no
+---
+
+# Problem 1 Nelder-Mead
+
+## Part a
+
+There are two steps here we need to justify. First there is an equality, then there is an approximation. The equality is simply an expansion of the Kenel Density Estimate function $\hat{f}_\sigma(x)$. Since $\frac1n$ is a constant and we can sum integrals we pull those two terms out of the integral to get that middle function.
+
+The approximation is done via our Monte Carlo integration. The integral we have in the summation is actually in the form of an expectation $\int g(x)f(x)dx$. In our case the $g(x) = k_\sigma(x,X_i)$ and the f(x) is our true density. Since we have samples $\{X_i\}_{i=1}^n$ from the true density $f(x)$ we can therefore use these samples in our Monte Carlo integration.
+
+In case I did not explain enough the actual integral estimation term is the $\frac{1}{n-1}\Sigma_{j\neq i}k_\sigma(X_j,X_i)$, which is merely the expected value of our KED functoin by summing up the sample points and dividing by the sample size, which is follows the expected value equation. The beginning part of the term ($\frac1n\Sigma_{i=1}^n$) comes from the first step mentioned above expanding $\hat{f}_\sigma(x)$.
+
+## Part b
+
+## Part c
+
+## Part d
+
+## Part e
+
+# Problem 2 Permutation Test
+
+## Part a
+
+## Part b
+
+# Problem 3 Cross-Validation
+
+# Problem 4 Bootstrap and Regression
+
+# Problem 5 Extra Points
+
+## Part a
+
+## Part b
+
+## Part c
+
+
