@@ -226,9 +226,9 @@ error3 <- numeric(n)
 
 for (i in 1:n) {
     # create models
-    m1_i <- lm(Temperature~Humidity, data=weather)
-    m2_i <- lm(Temperature~WindSpeed, data=weather)
-    m3_i <- lm(Temperature~Humidity+WindSpeed, data=weather)
+    m1_i <- lm(Temperature~Humidity, data=weather[-i,])
+    m2_i <- lm(Temperature~WindSpeed, data=weather[-i,])
+    m3_i <- lm(Temperature~Humidity+WindSpeed, data=weather[-i,])
     
     # predicted values
     y1 <- predict(m1_i, weather[i,])
@@ -249,6 +249,62 @@ print(mean(error3))
 The linear regression model that had the minimal error through the leave-one-out cross-validation was using both Humidity and WindSpeed to predict Temperature. Since the model with just Humidity did much better than just WindSpeed we can also infer that Humidity is likely more correlated with Temperature than WindSpeed is.
 
 # Problem 4 Bootstrap and Regression
+
+Here we use a significance level of $\alpha = 0.5$ to construct a $1-\alpha$ confidence interval for our simple linear regression $\beta$ parameters via non-parametric bootstrap sampling. We will be using the model that includes both Humidity and WindSpeed to determine temperature.
+
+```{r}
+alpha <- 0.05
+
+# model
+# temp = b_1 + b_2 * humid + b_3 * wind
+# fit regression - calculate estimates
+model <- lm(Temperature~Humidity+WindSpeed, data=weather)
+beta_hat <- model$coefficients
+epsilon_hat <- model$residuals
+model$coefficients
+```
+
+```{r}
+# bootstrap
+K <- 10000
+n <- nrow(weather)
+
+beta_boot <- matrix(nrow=K,ncol=length(beta_hat))
+for (i in 1:K) {
+    humid_boot_k <- sample(weather$Humidity, n, replace=TRUE)
+    wind_boot_k <- sample(weather$WindSpeed, n, replace=TRUE)
+    epsilon_boot_k <- sample(epsilon_hat, n, replace=TRUE)
+    
+    y_k <- beta_hat[1] + 
+        beta_hat[2]*humid_boot_k + 
+        beta_hat[3]*wind_boot_k + 
+        epsilon_boot_k
+    beta_boot[i,] <- lm(y_k~humid_boot_k+wind_boot_k)$coefficients
+}
+```
+
+```{r}
+# calculating confidence intervals
+i_est <- beta_boot[,1]
+interval <- quantile(i_est, probs=c(alpha/2, 1-alpha/2))
+print(interval)
+hist(i_est, main="Intercept Estimates")
+abline(v=interval, col='red')
+
+h_est <- beta_boot[,2]
+interval <- quantile(h_est, probs=c(alpha/2, 1-alpha/2))
+print(interval)
+hist(h_est, main="Humidity Estimates")
+abline(v=interval, col='red')
+
+w_est <- beta_boot[,3]
+interval <- quantile(w_est, probs=c(alpha/2, 1-alpha/2))
+print(interval)
+hist(w_est, main="WindSpeed Estimates")
+abline(v=interval, col='red')
+```
+
+Via our bootstrap sampling we are stating that our 95% confidence interval for the intercept estimate in $\text{Temp} = \beta_1 + \beta_2\text{Humid}+\beta_3\text{WindSpeed}$ is from 62.51 to 77.34. The $\beta_2$ parameter interval is from -63.28 to -47.86 and the $\beta_3$ parameter interval is from -2.02 to -1.17.
 
 # Problem 5 Extra Points
 
