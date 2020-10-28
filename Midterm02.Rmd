@@ -306,12 +306,7 @@ abline(v=interval, col='red')
 
 Via our bootstrap sampling we are stating that our 95% confidence interval for the intercept estimate in $\text{Temp} = \beta_1 + \beta_2\text{Humid}+\beta_3\text{WindSpeed}$ is from 62.51 to 77.34. The $\beta_2$ parameter interval is from -63.28 to -47.86 and the $\beta_3$ parameter interval is from -2.02 to -1.17.
 
-# Problem 5 Extra Points
+# Concept Map
 
-## Part a
-
-## Part b
-
-## Part c
-
+![Concept Map](./data/conceptmap2.jpg)
 

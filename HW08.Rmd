@@ -1,0 +1,47 @@
+---
+title: "Homework 08 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "11/01/2020"
+output:
+  pdf_document:
+    number_sections: no
+---
+
+```{r}
+set.seed(42)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(MASS)
+df <- anorexia
+```
+
+# Problem 1
+
+```{r}
+df$Weight_Increase <- as.numeric(df$Postwt > df$Prewt)
+df$Weight_Increase_Bool <- df$Postwt > df$Prewt
+```
+
+```{r}
+df %>%
+    ggplot(aes(x=Treat)) +
+    geom_bar(aes(fill=Weight_Increase_Bool))
+```
+
+# Problem 2
+
+Simplifying our data into a simply binary variable removes the weight/value of the data that comes with analyzing the difference in weight from pre to post treatment. This could be both good and bad. Sometimes we like to use this information to help quantify how significant of a change occurs; however since we are going to be looking between groups, and mostly care if one group had a significant increase versus another, we care more about comparing the amount of change between groups. In this way removing the value of differences of each person is good, because people are all different, so the extremity of change can vary a lot, so analyzing with this binary variable will not be greatly affected by outliers.
+
+# Problem 3
+
+# Problem 4
+
+# Problem 5
+
+# Problem 6
+
+
+
