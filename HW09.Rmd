@@ -1,0 +1,87 @@
+---
+title: "Homework 09 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "11/08/2020"
+output:
+  pdf_document:
+    number_sections: no
+---
+
+```{r}
+set.seed(42)
+```
+
+```{r include=FALSE}
+library(dplyr)
+library(MASS)
+df <- anorexia
+```
+
+# Problem 1
+
+```{r}
+df$Weight_Increase <- df$Postwt - df$Prewt
+```
+
+## Part a
+
+```{r}
+qqnorm(df$Weight_Increase)
+qqline(df$Weight_Increase)
+#qqplot(y, rt(300, df = 5))
+```
+
+The results follow the diagonal line (theoretical quantile match) fairly closely, but the tail to the left is steeper than the tail on the right compared to the normal, since the data points lie under the normal line of quantiles.
+
+## Part b
+
+```{r}
+# CBT
+df %>%
+    filter(Treat == 'CBT') %>%
+    .$Weight_Increase %>%
+    qqnorm()
+df %>%
+    filter(Treat == 'CBT') %>%
+    .$Weight_Increase %>%
+    qqline()
+
+# Cont
+df %>%
+    filter(Treat == 'Cont') %>%
+    .$Weight_Increase %>%
+    qqnorm()
+df %>%
+    filter(Treat == 'Cont') %>%
+    .$Weight_Increase %>%
+    qqline()
+
+# FT
+df %>%
+    filter(Treat == 'FT') %>%
+    .$Weight_Increase %>%
+    qqnorm()
+df %>%
+    filter(Treat == 'FT') %>%
+    .$Weight_Increase %>%
+    qqline()
+```
+
+Each of the three groups roughly follow a gaussian distribution. Actually a lot of the middle quantiles match up for the CBT group, which is promising and this trend of having the middle quantiles match up also happens with the other two treatment groups, so we likely can approximate the distribution using a gaussian distribution.
+
+# Problem 2
+
+## Part a
+
+## Part b
+
+## Part c
+
+## Part d
+
+## Part e
+
+# Problem 3
+
+# Problem 4
+
