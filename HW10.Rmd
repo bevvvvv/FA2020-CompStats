@@ -111,15 +111,4 @@ hist(df$lpsa)
 abline(v=cred_int,col='red')
 ```
 
-# Problem 2
-
-## Part a
-
-## Part b
-
-## Part c
-
-## Part d
-
-## Part e
 
