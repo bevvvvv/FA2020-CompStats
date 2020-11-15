@@ -42,7 +42,74 @@ mean(df$lpsa)
 
 ## Part d
 
+We will use Metropolis-Hastings to produce a sample from the posterior distribution using our liklihood and prior (which are both normal distributions). Our proposal distribution will be a uniform distribution with parameters roughly equal to the fifth and ninety-fifth percentiles of our sample. We will set them to x-2 and x+2.
+
+```{r}
+probs <- c(0.05, 0.95)
+quantile(df$lpsa, probs)
+```
+
+```{r}
+# init params
+n <- 1000
+sig_true <- sd(df$lpsa)
+
+mu_prior <- 0
+sig_prior <- sig_true # deterministic
+
+X <- numeric(n)
+X[1] <- mu_prior
+
+mu <- function(){rnorm(1,mean=mu_prior,sd=sig_true)} # prior
+f <- function(x){dnorm(x,mean=mu(),sd=sig_true)} # likelihood
+Q <- function(x1,x2){dunif(x1,min=x2-2,max=x2+2)}
+
+accept_fun <- function(x_c,x_p) {
+    accept <- (Q(x_c,x_p)/Q(x_p,x_c))*(f(x_p)/f(x_c))
+    return(min(accept,1))
+}
+```
+
+```{r}
+for(i in 2:n) {
+    x_proposed <- X[i-1] + runif(1,min=-2,max=2)
+    accept <- accept_fun(X[i-1],x_proposed)
+    decision <- rbinom(1,1,accept)
+    if(decision == 1){
+        X[i] = x_proposed
+    } else {
+        X[i] = X[i-1]
+    }
+}
+```
+
+```{r}
+plot(X,type='l')
+```
+
+We will not throw away any observations as it appears that we initialized our value around the convergence point.
+
 ## Part e
+
+```{r}
+c_val <- 0.05
+cred_int <- quantile(X, probs=c(c_val/2, 1-c_val/2))
+cred_int
+```
+
+## Part f
+
+```{r}
+hist(X)
+abline(v=cred_int,col='red')
+```
+
+This credible interval tells me that my data has a mean between -4 and 4 and the data falls within that interval as well.
+
+```{r}
+hist(df$lpsa)
+abline(v=cred_int,col='red')
+```
 
 # Problem 2
 
