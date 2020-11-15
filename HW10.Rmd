@@ -1,0 +1,58 @@
+---
+title: "Homework 10 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "11/15/2020"
+output:
+  pdf_document:
+    number_sections: no
+---
+
+```{r}
+set.seed(42)
+```
+
+```{r}
+df <- read.csv('./data/prostate.csv')
+head(df)
+```
+
+# Problem 1
+
+## Part a
+
+```{r}
+hist(df$lpsa)
+```
+
+I am going to use the normal distribution as the form of our liklihood function. The data is symmetric and has a single mode in the center. This mimics the form of a normal distribution.
+
+## Part b
+
+Note that we will use the sample variance as our "known", fixed variance value.
+
+We will use a normal distribution as our prior distribution for our mean. We will use this as it is the conjugate prior for the normal distribution likelihood, so the posterior will also be a normal distribution.
+
+## Part c
+
+A large portion of the values are near 0, so we will use the prior parameter $\mu_0 = 0$. It is likely that the 0 level is considered the "normal" level for measurement purposes as (via very brief research) there is a certain level that doctors use as a cutoff for whether further tests are needed (in the non-log variable). The sample mean is also very close to this value.
+
+```{r}
+mean(df$lpsa)
+```
+
+## Part d
+
+## Part e
+
+# Problem 2
+
+## Part a
+
+## Part b
+
+## Part c
+
+## Part d
+
+## Part e
+

@@ -191,5 +191,318 @@ According to this analysis our evidence is not credible enough to determine that
 
 # Problem 3
 
+## Part a
+
+The conjugate prior to the liklihood for the normal distribution is the inverse gamma distribution. Our posterior is then also an inverse gamma distribution.
+
+## Part b
+
+For the inverse gamma distribution I will use the prior parameters $\alpha = \beta = 1$. The inverse gamma distribution for these parameters is flatter and has a rather thick tail. This flatter density is more desirable for our prior, since we are basically stating we are unsure where exactly the variance is by having a rather flat pdf. The inverse gamma also does not have a defined mean for this value of $\alpha$, since the tail is too thick. This makes our prior "knowledge" have no claim about an exact starting variance value.
+
+## Part c
+
+\[\alpha \rightarrow \alpha + n/2\]
+\[\beta \rightarrow \beta + \frac12\Sigma(X_i-\mu)^2\]
+
+```{r}
+update_alpha <- function(x, prior_alpha) {
+    prior_alpha + length(x) / 2
+}
+
+update_beta <- function(x, prior_beta, mu) {
+    prior_beta + 0.5 * (sum((x - mu)^2))
+}
+```
+
+```{r}
+df_cbt <- df %>%
+    filter(Treat == 'CBT')
+df_cont <- df %>%
+    filter(Treat == 'Cont')
+df_ft <- df %>%
+    filter(Treat == 'FT')
+
+true_sig_cbt <- sd(df_cbt$Weight_Increase)
+true_sig_cont <- sd(df_cbt$Weight_Increase)
+true_sig_ft <- sd(df_cbt$Weight_Increase)
+
+prior_alpha_cbt <- 1
+prior_beta_cbt <- 1
+prior_alpha_cont <- 1
+prior_beta_cont <- 1
+prior_alpha_ft <- 1
+prior_beta_ft <- 1
+```
+
+```{r}
+print(paste0('Prior CBT: ', prior_alpha_cbt, ' ', prior_beta_cbt))
+print(paste0('Prior Cont: ', prior_alpha_cont, ' ', prior_beta_cont))
+print(paste0('Prior FT: ', prior_alpha_ft, ' ', prior_beta_ft))
+```
+
+```{r}
+post_alpha_cbt <- update_alpha(df_cbt$Weight_Increase, prior_alpha_cbt)
+post_beta_cbt <- update_beta(df_cbt$Weight_Increase, prior_beta_cbt, mean(df_cbt$Weight_Increase))
+post_alpha_cont <- update_alpha(df_cont$Weight_Increase, prior_alpha_cont)
+post_beta_cont <- update_beta(df_cont$Weight_Increase, prior_beta_cont, mean(df_cont$Weight_Increase))
+post_alpha_ft <- update_alpha(df_ft$Weight_Increase, prior_alpha_ft)
+post_beta_ft <- update_beta(df_ft$Weight_Increase, prior_beta_ft, mean(df_ft$Weight_Increase))
+```
+
+```{r}
+print(paste0('Posterior CBT: ', post_alpha_cbt, ' ', post_beta_cbt))
+print(paste0('Posterior Cont: ', post_alpha_cont, ' ', post_beta_cont))
+print(paste0('Posterior FT: ', post_alpha_ft, ' ', post_beta_ft))
+```
+
+## Part d
+
+```{r}
+library(invgamma)
+```
+
+```{r}
+curve(dinvgamma(x,prior_alpha_cbt,prior_beta_cbt), 0, true_sig_cbt^2 + 5, col='black')
+curve(dinvgamma(x,post_alpha_cbt,post_beta_cbt), 0, true_sig_cbt^2 + 5, add=T, col='blue')
+abline(v=post_beta_cbt/(post_alpha_cbt-1),col='blue')
+abline(v=true_sig_cbt^2,col='red')
+```
+
+```{r}
+curve(dinvgamma(x,prior_alpha_cont,prior_beta_cont), 0, true_sig_cont^2 + 10, col='black')
+curve(dinvgamma(x,post_alpha_cont,post_beta_cont), 0, true_sig_cont^2 + 10, add=T, col='blue')
+abline(v=post_beta_cont/(post_alpha_cont-1),col='blue')
+abline(v=true_sig_cont^2,col='red')
+```
+
+```{r}
+curve(dinvgamma(x,prior_alpha_ft,prior_beta_ft), 0, true_sig_ft^2 + 5, col='black')
+curve(dinvgamma(x,post_alpha_ft,post_beta_ft), 0, true_sig_ft^2 + 5, add=T, col='blue')
+abline(v=post_beta_ft/(post_alpha_ft-1),col='blue')
+abline(v=true_sig_ft^2,col='red')
+```
+
+The above charts have two curves. The black curve is the prior distribution, and the posterior distribution is the blue curve. In each of the three plots the inverse gamma function moves into a much flatter shape centered around a much higher variance. The vertical blue line denotes the mean of the inverse gamme function and the red line denotes the variance found in our data. In each of the three cases we can see that the change in the distribution followed from the variance of our data. Each group had the inverse gamma move to be close to the sample variance of the data.
+
+## Part e
+
+```{r}
+M <- 1000
+c_val <- 0.05
+
+samples_cbt <- rinvgamma(M, post_alpha_cbt, post_beta_cbt)
+samples_cont <- rinvgamma(M, post_alpha_cont, post_beta_cont)
+samples_ft <- rinvgamma(M, post_alpha_ft, post_beta_ft)
+
+prob_vec <- c(c_val, 1-c_val)
+ci_cbt <- quantile(samples_cbt, probs=prob_vec)
+ci_cont <- quantile(samples_cont, probs=prob_vec)
+ci_ft <- quantile(samples_ft, probs=prob_vec)
+```
+
+```{r}
+print(paste0('CBT Cred Int: ', ci_cbt))
+print(paste0('Cont Cred Int: ', ci_cont))
+print(paste0('FT Cred Int: ', ci_ft))
+```
+
+According to this analysis our evidence is credible enough to determine that any of the variance of the distribution around our sample mean is between 25 and 95 for all of the groups. The FT treatment had the lowest variance values and the control treatment gorup had the highest variance values. Perhaps this could indicate that the treatment groups actually had some effect, since they did not vary as much as the "untouched" control group.
+
 # Problem 4
 
+## Part a
+
+For the full normal setting we essentially use the same prior and posterior equations as before, but we set the conjugate prior/posterior for the mean to be dependent on the variance belief set. For example:
+
+\[\pi(\sigma^2)\text{~} InvGamma(\alpha,\beta)\]
+\[\pi(\mu|\sigma^2) \text{~}N(\mu_0, \sigma^2/n_0)\]
+
+## Part b
+
+We will use the same prior parameters as before for the same reasoning where $\mu = 0, \alpha=\beta=1$. We do have an introduction of a new parameter $n_0$. This parameter affects the variance of the normal distribution that states our beliefs about the sample mean. We will initialize this to 1. $n_0$ is basically a representation of the number of samples we have collected so far, but we cannot divide by zero, so we will start at 1.
+
+## Part c
+
+\[\alpha \rightarrow \alpha + n/2\]
+\[\beta \rightarrow \beta + \frac12\Sigma(X_i-\overline{X})^2 + \frac{n_0n}{2(n + n_0)}(\overline{X} - \mu_0)^2\]
+\[\sigma^2_0 \rightarrow (\frac{n}{\sigma^2} + \frac{1}{\sigma_0^2})^{-1}\]
+\[\mu_0 \rightarrow \frac{n}{n+n_0}\overline{X} + \frac{n_0}{n+n_0}\mu_0\]
+\[n_0 \rightarrow n_0 + n\]
+
+```{r}
+update_alpha <- function(x, prior_a) {
+    prior_a + length(x) / 2
+}
+
+update_beta <- function(x, prior_b, prior_mu, prior_n) {
+    x_bar <- mean(x)
+    n <- length(x)
+    
+    result <- prior_b
+    result <- result + 0.5 * sum((x - x_bar)^2)
+    result <- result + (n * prior_n) / (2 * (n + prior_n)) * (x_bar - prior_mu)^2
+    result
+}
+
+update_mu <- function(x, prior_mu, prior_n) {
+    x_bar <- mean(x)
+    n <- length(x)
+    
+    result <- n / (n + prior_n) * x_bar
+    result <- result + prior_n / (n + prior_n) * prior_mu
+    result
+}
+
+update_n <- function(x, prior_n) {
+    length(x) + prior_n
+} 
+```
+
+```{r}
+p_a_cbt <- 1
+p_b_cbt <- 1
+p_mu_cbt <- 0
+p_n_cbt <- 1
+p_a_cont <- 1
+p_b_cont <- 1
+p_mu_cont <- 0
+p_n_cont <- 1
+p_a_ft <- 1
+p_b_ft <- 1
+p_mu_ft <- 0
+p_n_ft <- 1
+```
+
+```{r}
+print(paste0('Prior Params Alpha, Beta, Mu, N'))
+print(paste0('Prior CBT: ', p_a_cbt, ', ', p_b_cbt, ', ', p_mu_cbt, ', ', p_n_cbt))
+print(paste0('Prior CBT: ', p_a_cont, ', ', p_b_cont, ', ', p_mu_cont, ', ', p_n_cont))
+print(paste0('Prior CBT: ', p_a_ft, ', ', p_b_ft, ', ', p_mu_ft, ', ', p_n_ft))
+```
+
+```{r}
+po_a_cbt <- update_alpha(df_cbt$Weight_Increase, p_a_cbt)
+po_b_cbt <- update_beta(df_cbt$Weight_Increase, p_b_cbt, p_mu_cbt, p_n_cbt)
+po_mu_cbt <- update_mu(df_cbt$Weight_Increase, p_mu_cbt, p_n_cbt)
+po_n_cbt <- update_n(df_cbt$Weight_Increase, p_n_cbt)
+po_a_cont <- update_alpha(df_cont$Weight_Increase, p_a_cont)
+po_b_cont <- update_beta(df_cont$Weight_Increase, p_b_cont, p_mu_cont, p_n_cont)
+po_mu_cont <- update_mu(df_cont$Weight_Increase, p_mu_cont, p_n_cont)
+po_n_cont <- update_n(df_cont$Weight_Increase, p_n_cont)
+po_a_ft <- update_alpha(df_ft$Weight_Increase, p_a_ft)
+po_b_ft <- update_beta(df_ft$Weight_Increase, p_b_ft, p_mu_ft, p_n_ft)
+po_mu_ft <- update_mu(df_ft$Weight_Increase, p_mu_ft, p_n_ft)
+po_n_ft <- update_n(df_ft$Weight_Increase, p_n_ft)
+```
+
+```{r}
+print(paste0('Posterior Params Alpha, Beta, Mu, N'))
+print(paste0('Posterior CBT: ', po_a_cbt, ', ', po_b_cbt, ', ', po_mu_cbt, ', ', po_n_cbt))
+print(paste0('Posterior CBT: ', po_a_cont, ', ', po_b_cont, ', ', po_mu_cont, ', ', po_n_cont))
+print(paste0('Posterior CBT: ', po_a_ft, ', ', po_b_ft, ', ', po_mu_ft, ', ', po_n_ft))
+```
+
+## Part d
+
+First we plot the variance distributions.
+
+```{r}
+curve(dinvgamma(x,p_a_cbt,p_b_cbt), 0, true_sig_cbt^2 + 5, col='black')
+curve(dinvgamma(x,po_a_cbt,po_b_cbt), 0, true_sig_cbt^2 + 5, add=T, col='blue')
+abline(v=po_b_cbt/(po_a_cbt-1),col='blue')
+abline(v=true_sig_cbt^2,col='red')
+```
+
+```{r}
+curve(dinvgamma(x,p_a_cont,p_b_cont), 0, true_sig_cont^2 + 10, col='black')
+curve(dinvgamma(x,po_a_cont,po_b_cont), 0, true_sig_cont^2 + 10, add=T, col='blue')
+abline(v=po_b_cont/(po_a_cont-1),col='blue')
+abline(v=true_sig_cont^2,col='red')
+```
+
+```{r}
+curve(dinvgamma(x,p_a_ft,p_b_ft), 0, true_sig_ft^2 +5, col='black')
+curve(dinvgamma(x,po_a_ft,po_b_ft), 0, true_sig_ft^2 +5, add=T, col='blue')
+abline(v=po_b_ft/(po_a_ft-1),col='blue')
+abline(v=true_sig_ft^2,col='red')
+```
+
+Next we plot the mean distributions.
+
+```{r}
+min_x <- min(df_cbt$Weight_Increase)
+max_x <- max(df_cbt$Weight_Increase)
+hist(df_cbt$Weight_Increase, freq=F)
+curve(dnorm(x,mean=p_mu_cbt,sd=true_sig_cbt), min_x, max_x, add=T, col='black')
+abline(v=prior_mu_cbt,col='black')
+curve(dnorm(x,mean=po_mu_cbt,sd=po_b_cbt/(po_a_cbt-1)), min_x, max_x, add=T, col='blue')
+abline(v=po_mu_cbt,col='blue')
+```
+
+```{r}
+min_x <- min(df_cont$Weight_Increase)
+max_x <- max(df_cont$Weight_Increase)
+hist(df_cont$Weight_Increase, freq=F)
+curve(dnorm(x,mean=p_mu_cont,sd=true_sig_cont), min_x, max_x, add=T, col='black')
+abline(v=prior_mu_cont,col='black')
+curve(dnorm(x,mean=po_mu_cont,sd=po_b_cont/(po_a_cont-1)), min_x, max_x, add=T, col='blue')
+abline(v=po_mu_cont,col='blue')
+```
+
+```{r}
+min_x <- min(df_ft$Weight_Increase)
+max_x <- max(df_ft$Weight_Increase)
+hist(df_ft$Weight_Increase, freq=F)
+curve(dnorm(x,mean=p_mu_ft,sd=true_sig_ft), min_x, max_x, add=T, col='black')
+abline(v=prior_mu_ft,col='black')
+curve(dnorm(x,mean=po_mu_ft,sd=po_b_ft/(po_a_ft-1)), min_x, max_x, add=T, col='blue')
+abline(v=po_mu_ft,col='blue')
+```
+
+We see the same exact results in the difference from prior to posterior for the variance parameter; however the results for the distribution of the mean parameter is much different. Before the distribution for the mean had a decreasing varaince after adding samples, but this the variance has a large increase. This comes from us no longer "knowing" the true variance. Since we do not have the variance fixed, we can only base the distribution of the mean based off the mean and variance that we observe and our observed variance was much higher than our prior beliefs, so the variance increase this time.
+
+## Part e
+
+```{r}
+M <- 1000
+c_val <- 0.05
+
+samples_cbt <- rinvgamma(M, po_a_cbt, po_b_cbt)
+samples_cont <- rinvgamma(M, po_a_cont, po_b_cont)
+samples_ft <- rinvgamma(M, po_a_ft, po_b_ft)
+
+prob_vec <- c(c_val, 1-c_val)
+ci_cbt <- quantile(samples_cbt, probs=prob_vec)
+ci_cont <- quantile(samples_cont, probs=prob_vec)
+ci_ft <- quantile(samples_ft, probs=prob_vec)
+```
+
+```{r}
+print(paste0('CBT Cred Int: ', ci_cbt))
+print(paste0('Cont Cred Int: ', ci_cont))
+print(paste0('FT Cred Int: ', ci_ft))
+```
+
+Again we see the same credible intervals as problem 3, since variance is not based off our mean value.
+
+```{r}
+M <- 1000
+c_val <- 0.05
+
+samples_cbt <- rnorm(M, po_mu_cbt, po_b_cbt / (po_a_cbt-1))
+samples_cont <- rnorm(M, po_mu_cont, po_b_cont / (po_a_cont-1))
+samples_ft <- rnorm(M, po_mu_ft, po_b_ft/(po_a_ft-1))
+
+prob_vec <- c(c_val, 1-c_val)
+ci_cbt <- quantile(samples_cbt, probs=prob_vec)
+ci_cont <- quantile(samples_cont, probs=prob_vec)
+ci_ft <- quantile(samples_ft, probs=prob_vec)
+```
+
+```{r}
+print(paste0('CBT Cred Int: ', ci_cbt))
+print(paste0('Cont Cred Int: ', ci_cont))
+print(paste0('FT Cred Int: ', ci_ft))
+```
+
+We can see that due to the variance in our sample, if we don't hold our sample variance as the gorund truth, then we have no where near enough evidence to make claims about what the mean should be. Compared to the value of weights a person could take on the values within our credible interval essentially say the true value is just about any weight gain/loss a person can endure.
