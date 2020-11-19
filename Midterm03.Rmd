@@ -65,36 +65,129 @@ beta_post <- beta_prior + n - X[1]
 curve(dbeta(x,alpha_post,beta_post),from=0,to=1,xlab="p",ylab="",main='Posterior (n=1000)')
 ```
 
+We can see that the posterior distribution updates our beliefs about the parameter p based off the data we saw. For the first comparison we got a sample parameter value of 0.2, but we are not confident about that for the whole population with a small sample size, so the distribution is fat. The opposite in terms of fatness happens in the second case where we use a large number of observations, but the updated distribution is still centered around the sample parameter.
 
-# Problem 2
+# Problem 1 Exponential Likelihood
 
-## Part a
+## Part a: Likelihood Parameters
 
-## Part b
+The exponential likelihood take one parameter $\lambda$ known as its rate of decay. This parameter must be greater than. This rate dictates the rate of decay in the exponential decay, so a larger parameter will show a faster rate of decay. This can be seen in the likelihood function:
 
-## Part c
+\[f(x|\lambda)=\lambda e^{-\lambda x}\]
 
-## Part d
+## Part b: Conjugate Prior
 
-# Problem 3
+The conjugate prior to an exponential likelihood is the Gamma distribution. The domain of this distribution is real numbers greater than 0, which matches our likelhood parameter possible values. The gamma distribution has two parameters $\alpha$ and $\beta$ which pertain to the shape and rate of the pdf. A larger $beta$ will create a prior pdf with a sharper rate of decay, meaning the parameter is more likely to be closer to zero. $\alpha$ will affect the shape of the distribution where a lower value will look like an exponential decay and a highervalue will create a modal distribution centered around a value greater than 0.
 
-## Part a
+## Part c: Posterior Parameters
 
-## Part b
+The posterior parameters based off the data and prior are as follows:
 
-## Part c
+\[\alpha \rightarrow \alpha + n\]
+\[\beta \rightarrow \beta + \Sigma_{i=1}^nX_i\]
 
-## Part d
+Here we have two different effects captured with each parameter. The parameter $\alpha$ is acting as a count of the sample size of observed samples. With more samples we have a greater $\alpha$, which will help to center the peak around an observed parameter. The parameter $\beta$ is steadily increasing by taking on a value of the summation of the values found in the data. A larger value of the parameter will create a tighter distribution, so essentially we are more confident with large values in our data, or a large value from many observations.
 
-# Problem 4
+## Part d: Plots
 
-## Part a
+Below is our prior distribution with initial values of 1.
 
-## Part b
+```{r}
+alpha_prior <- 1
+beta_prior <- 1
 
-## Part c
+curve(dgamma(x,alpha_prior,beta_prior),from=0,to=10,xlab="lambda",ylab="",main='Prior')
+```
 
-## Part d
+For this first example we have a small data sample size with a few large values.
+
+```{r}
+X <- c(0.1, 0.5, 0.1, 0.2, 4)
+n <- length(X)
+alpha_post <- alpha_prior + n
+beta_post <- beta_prior + sum(X)
+
+curve(dbeta(x,alpha_post,beta_post),from=0,to=10,xlab="lambda",ylab="",main='Posterior (n=5)')
+```
+
+The second example we have many samples, but all very small values.
+
+```{r}
+X <- seq(0.1, 0.3, 0.001)
+n <- length(X)
+alpha_post <- alpha_prior + n
+beta_post <- beta_prior + sum(X)
+
+curve(dbeta(x,alpha_post,beta_post),from=0,to=10,xlab="lambda",ylab="",main='Posterior (large n)')
+```
+
+# Problem 3: Gaussian Likelihood (Known Sigma)
+
+## Part a: Likelihood Parameters
+
+A Gaussian likelihood has two parameters, the mean and variance, also called $\mu$ and $\sigma$. Both of these parameters can take on any real value on the number line. The mean or $\mu$ dictates where the symmetrica gaussian distribution is centered. The variance or $\sigma^2$ dictates how high the peak is compared to how wide/large the tails are. A lower variance corresponds to a tigher/higher peak. In this problem we will hold $\sigma$ fixed and "known".
+
+## Part b: Conjugate Prior
+
+The conjugate prior for a Gaussian likelihood with a deterministic $\sigma$ is also a gaussian distribution. The domain of this distribution is the entire real line. The prior parameters for this Gaussian are a $\mu_0$ and $\sigma_0$. Where $\mu_0$ would be our initial belief of the actual value of $\mu$ and $\sigma$ would be larger the less confidence we have in our initial belief.
+
+## Part c: Posterior Parameters
+
+The posterior parameters based off the data and prior are as follows:
+
+\[\sigma_0^2 \rightarrow (\frac{n}{\sigma^2}+\frac{1}{\sigma_0^2})^{-1}\]
+\[\mu_0 \rightarrow (\frac{n}{\sigma^2}+\frac{1}{\sigma_0^2})^{-1}(\frac{n\overline{X}}{\sigma^2}+\frac{\mu_0}{\sigma_0^2})\]
+
+Here we have a steadily decreasing variance that decreases as our sample size increases, which makes sense, since we are essentially more confident about the true value of the parameter with more evidence. The estimated mean has two components in the posterior. The updated variance multipled by a second term. This second term captures adding the new sample mean to our existing knowledge in $\mu_0$
+
+## Part d: Plots
+
+Below is our prior distribution with initial values of $\mu_0 = 0$ and $\sigma = 4$. I am choosing a larger varaince the expected variance to communicate uncertainty, since I will be choosing values close to zero in my example (actual variance would be much smaller)
+
+```{r}
+mu_prior <- 0
+sig_prior <- 4
+
+curve(dnorm(x,mu_prior,sig_prior),from=-10,to=10,xlab="mu",ylab="",main='Prior')
+```
+
+For this first example we have a small data sample size.
+
+```{r}
+X <- rnorm(10, 0, 4)
+print(mean(X))
+n <- length(X)
+sigma_post <- (n / sd(X)^2 + 1 / sig_prior^2) ^ -1
+mu_post <-  sigma_post * (n * mean(X) / sd(X)^2 + mu_prior / sig_prior^2)
+
+curve(dnorm(x,mu_post,sigma_post),from=-10,to=10,xlab="mu",ylab="",main='Posterior (n=10)')
+```
+
+The second example we have many samples.
+
+```{r}
+X <- rnorm(1000, 0, 4)
+print(mean(X))
+n <- length(X)
+sigma_post <- (n / sd(X)^2 + 1 / sig_prior^2) ^ -1
+mu_post <-  sigma_post * (n * mean(X) / sd(X)^2 + mu_prior / sig_prior^2)
+
+curve(dnorm(x,mu_post,sigma_post),from=-10,to=10,xlab="mu",ylab="",main='Posterior (n=1000)')
+```
+
+We can see that in both cases the posterior parameter for $\mu$ adjusts to the sample mean, but the variance is very different based on the sample size of the evidence.
+
+# Problem 4: Gaussian Likelihood (Known Mean)
+
+## Part a: Likelihood Parameters
+
+A Gaussian likelihood has two parameters, the mean and variance, also called $\mu$ and $\sigma$. Both of these parameters can take on any real value on the number line. The mean or $\mu$ dictates where the symmetrica gaussian distribution is centered. The variance or $\sigma^2$ dictates how high the peak is compared to how wide/large the tails are. A lower variance corresponds to a tigher/higher peak. In this problem we will hold $\mu$ fixed and "known".
+
+## Part b: Conjugate Prior
+
+## Part c: Posterior Parameters
+
+## Part d: Plots
 
 # Problem 5
 
