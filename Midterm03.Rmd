@@ -1,0 +1,109 @@
+---
+title: "Midterm 03 - STAT440"
+author: "Joseph Sepich (jps6444)"
+date: "11/20/2020"
+output:
+  pdf_document:
+    number_sections: no
+---
+
+```{r}
+set.seed(42)
+```
+
+# Problem 1 Bernoulli Bayes
+
+## Part a: Likelihood Parameters
+
+The Bernoulli likelihood takes one parameter often referred to as p. This parameter can take a value between 0 and 1, which is often referred to as the probability of a successful event. Note the likelihood function:
+
+\[f(X_i|\theta)=\Pi_{i=1}^n\theta^{X_i}(1-\theta)^{(1-X_i)}\]
+
+## Part b: Conjugate Prior
+
+The conjugate prior to a Bernoulli likelihood is the Beta distribution. The domain of this distribution lies between 0 and 1. This distribution takes two parameters $\alpha$ and $\beta$. These two parameters help to shape the distribution. Since these parameters shape the distribution that lie between 0 and 1 (which is the values our parameter can take on), the parameters dictate the distribution of the parameter $\theta$ or p. Higher values of alpha creates a decaying tail towards zero and lower values (less than 1) create a growing tail toward zero. The opposite occurs near 1 for beta. In this way a high alpha would mean our parameter is more likely to be higher (towards 1), while the same value of alpha and beta would create a symmetric distribution for our parameter.
+
+## Part c: Posterior Parameters
+
+The posterior parameters based off the data and prior are as follows:
+
+\[\alpha \rightarrow \alpha + n\overline{X}\]
+\[\beta \rightarrow \beta + n - n\overline{X}\]
+
+Both parameters depend on the term that is the summation of the events. $\alpha$ will become larger if there are many successes, which makes the beta distribution show that it is more likely for the success rate to be higher. $\beta$ will become larger if there are many failures, which makes the beta distribution show that it is more likely for the success rate to be lower.
+
+## Part d: Plots
+
+Below is our prior distribution with initial values of 1 each to show a initial belief that any parameter values from 0 to 1 is equally likely.
+
+```{r}
+alpha_prior <- 1
+beta_prior <- 1
+
+curve(dbeta(x,alpha_prior,beta_prior),from=0,to=1,xlab="p",ylab="",main='Prior')
+```
+
+For this first example we have a small data sample size with very few successes.
+
+```{r}
+X <- c(0, 0, 0, 0, 1)
+n <- length(X)
+alpha_post <- alpha_prior + n * mean(X)
+beta_post <- beta_prior + n - n*mean(X)
+
+curve(dbeta(x,alpha_post,beta_post),from=0,to=1,xlab="p",ylab="",main='Posterior (n=5)')
+```
+
+The second example we have many samples, but roughly half (p=0.55) are successes.
+
+```{r}
+X <- rbinom(1, 1000, 0.55)
+n <- 1000
+alpha_post <- alpha_prior + X[1]
+beta_post <- beta_prior + n - X[1]
+
+curve(dbeta(x,alpha_post,beta_post),from=0,to=1,xlab="p",ylab="",main='Posterior (n=1000)')
+```
+
+
+# Problem 2
+
+## Part a
+
+## Part b
+
+## Part c
+
+## Part d
+
+# Problem 3
+
+## Part a
+
+## Part b
+
+## Part c
+
+## Part d
+
+# Problem 4
+
+## Part a
+
+## Part b
+
+## Part c
+
+## Part d
+
+# Problem 5
+
+## Part a
+
+## Part b
+
+## Part c
+
+## Part d
+
+## Part e
