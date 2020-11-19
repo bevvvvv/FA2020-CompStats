@@ -125,7 +125,7 @@ curve(dbeta(x,alpha_post,beta_post),from=0,to=10,xlab="lambda",ylab="",main='Pos
 
 ## Part a: Likelihood Parameters
 
-A Gaussian likelihood has two parameters, the mean and variance, also called $\mu$ and $\sigma$. Both of these parameters can take on any real value on the number line. The mean or $\mu$ dictates where the symmetrica gaussian distribution is centered. The variance or $\sigma^2$ dictates how high the peak is compared to how wide/large the tails are. A lower variance corresponds to a tigher/higher peak. In this problem we will hold $\sigma$ fixed and "known".
+A Gaussian likelihood has two parameters, the mean and variance, also called $\mu$ and $\sigma$. The mean can take on any real value while $\sigma > 0$. The mean or $\mu$ dictates where the symmetrica gaussian distribution is centered. The variance or $\sigma^2$ dictates how high the peak is compared to how wide/large the tails are. A lower variance corresponds to a tigher/higher peak. In this problem we will hold $\sigma$ fixed and "known".
 
 ## Part b: Conjugate Prior
 
@@ -181,13 +181,58 @@ We can see that in both cases the posterior parameter for $\mu$ adjusts to the s
 
 ## Part a: Likelihood Parameters
 
-A Gaussian likelihood has two parameters, the mean and variance, also called $\mu$ and $\sigma$. Both of these parameters can take on any real value on the number line. The mean or $\mu$ dictates where the symmetrica gaussian distribution is centered. The variance or $\sigma^2$ dictates how high the peak is compared to how wide/large the tails are. A lower variance corresponds to a tigher/higher peak. In this problem we will hold $\mu$ fixed and "known".
+A Gaussian likelihood has two parameters, the mean and variance, also called $\mu$ and $\sigma$. The mean can take on any real value while $\sigma > 0$. The mean or $\mu$ dictates where the symmetrica gaussian distribution is centered. The variance or $\sigma^2$ dictates how high the peak is compared to how wide/large the tails are. A lower variance corresponds to a tigher/higher peak. In this problem we will hold $\mu$ fixed and "known".
 
 ## Part b: Conjugate Prior
 
+The conjugate prior for a Gaussian likelihoood with known mean is an inverse gamma distribution. The domain of this distribution is $(0, \infty)$. The prior parameters for this distribution are $\alpha$ and $\beta$. $\alpha$ is known as the shape parameter and $\beta$ is known as the scale parameter. A smaller $\beta$ will create a larger rate of decay on the right tail and a smaller $alpha$ will result in a flatter distribution. Note that the mean of this distribution is $\frac{\beta}{\alpha - 1}$.
+
 ## Part c: Posterior Parameters
 
+The posterior parameters based off the data and prior are as follows:
+
+\[\alpha \rightarrow \alpha + n/2\]
+\[\beta \rightarrow \beta + \frac12 \Sigma(X_i-\mu)^2\]
+
+The $\alpha$ parameter is a measure of the number of observations in our evidence while the $\beta$ parameter is updated by adding the sample variance from the set of incoming observtions.
+
 ## Part d: Plots
+
+We will base our plots below around a know mean of 0. We will start our initial guess of variance around 4 where $\beta=4$ and $\alpha=2$.
+
+```{r}
+library(invgamma)
+alpha_prior <- 2
+beta_prior <- 4
+
+curve(dinvgamma(x,alpha_prior,beta_prior),from=0,to=5,xlab="mu",ylab="",main='Prior')
+```
+
+For this first example we have a small data sample size.
+
+```{r}
+X <- rnorm(10, 0, 4)
+print(sd(X)^2)
+n <- length(X)
+alpha_post <- alpha_prior + n/2
+beta_post <-  beta_prior + 1/2*sum(X^2)
+
+curve(dinvgamma(x,alpha_post,beta_post),from=0,to=20,xlab="mu",ylab="",main='Posterior (n=10)')
+```
+
+The second example we have many samples.
+
+```{r}
+X <- rnorm(1000, 0, 4)
+print(sd(X)^2)
+n <- length(X)
+alpha_post <- alpha_prior + n/2
+beta_post <-  beta_prior + 1/2*sum(X^2)
+
+curve(dinvgamma(x,alpha_post,beta_post),from=0,to=20,xlab="mu",ylab="",main='Posterior (n=1000)')
+```
+
+We can see in both cases that the posterior distribution mean is the value of the sample variance exhibited in our data or evidence, but when we have a much larger sample size (n) then the inverse gamma distribution has much smaller tails, which would shrink our credible interval.
 
 # Problem 5
 
