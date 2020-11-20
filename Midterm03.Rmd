@@ -52,6 +52,7 @@ alpha_post <- alpha_prior + n * mean(X)
 beta_post <- beta_prior + n - n*mean(X)
 
 curve(dbeta(x,alpha_post,beta_post),from=0,to=1,xlab="p",ylab="",main='Posterior (n=5)')
+abline(v=0.2,col='red')
 ```
 
 The second example we have many samples, but roughly half (p=0.55) are successes.
@@ -63,6 +64,7 @@ alpha_post <- alpha_prior + X[1]
 beta_post <- beta_prior + n - X[1]
 
 curve(dbeta(x,alpha_post,beta_post),from=0,to=1,xlab="p",ylab="",main='Posterior (n=1000)')
+abline(v=0.55,col='red')
 ```
 
 We can see that the posterior distribution updates our beliefs about the parameter p based off the data we saw. For the first comparison we got a sample parameter value of 0.2, but we are not confident about that for the whole population with a small sample size, so the distribution is fat. The opposite in terms of fatness happens in the second case where we use a large number of observations, but the updated distribution is still centered around the sample parameter.
@@ -149,6 +151,7 @@ mu_prior <- 0
 sig_prior <- 4
 
 curve(dnorm(x,mu_prior,sig_prior),from=-10,to=10,xlab="mu",ylab="",main='Prior')
+abline(v=0,col='red')
 ```
 
 For this first example we have a small data sample size.
@@ -161,6 +164,7 @@ sigma_post <- (n / sd(X)^2 + 1 / sig_prior^2) ^ -1
 mu_post <-  sigma_post * (n * mean(X) / sd(X)^2 + mu_prior / sig_prior^2)
 
 curve(dnorm(x,mu_post,sigma_post),from=-10,to=10,xlab="mu",ylab="",main='Posterior (n=10)')
+abline(v=mean(X),col='red')
 ```
 
 The second example we have many samples.
@@ -173,6 +177,7 @@ sigma_post <- (n / sd(X)^2 + 1 / sig_prior^2) ^ -1
 mu_post <-  sigma_post * (n * mean(X) / sd(X)^2 + mu_prior / sig_prior^2)
 
 curve(dnorm(x,mu_post,sigma_post),from=-10,to=10,xlab="mu",ylab="",main='Posterior (n=1000)')
+abline(v=mean(X),col='red')
 ```
 
 We can see that in both cases the posterior parameter for $\mu$ adjusts to the sample mean, but the variance is very different based on the sample size of the evidence.
@@ -205,7 +210,7 @@ library(invgamma)
 alpha_prior <- 2
 beta_prior <- 4
 
-curve(dinvgamma(x,alpha_prior,beta_prior),from=0,to=5,xlab="mu",ylab="",main='Prior')
+curve(dinvgamma(x,alpha_prior,beta_prior),from=0,to=5,xlab="sigma",ylab="",main='Prior')
 ```
 
 For this first example we have a small data sample size.
@@ -217,7 +222,8 @@ n <- length(X)
 alpha_post <- alpha_prior + n/2
 beta_post <-  beta_prior + 1/2*sum(X^2)
 
-curve(dinvgamma(x,alpha_post,beta_post),from=0,to=20,xlab="mu",ylab="",main='Posterior (n=10)')
+curve(dinvgamma(x,alpha_post,beta_post),from=0,to=20,xlab="sigma",ylab="",main='Posterior (n=10)')
+abline(v=sd(X)^2,col="red")
 ```
 
 The second example we have many samples.
@@ -229,19 +235,159 @@ n <- length(X)
 alpha_post <- alpha_prior + n/2
 beta_post <-  beta_prior + 1/2*sum(X^2)
 
-curve(dinvgamma(x,alpha_post,beta_post),from=0,to=20,xlab="mu",ylab="",main='Posterior (n=1000)')
+curve(dinvgamma(x,alpha_post,beta_post),from=0,to=20,xlab="sigma",ylab="",main='Posterior (n=1000)')
+abline(v=sd(X)^2,col='red')
 ```
 
 We can see in both cases that the posterior distribution mean is the value of the sample variance exhibited in our data or evidence, but when we have a much larger sample size (n) then the inverse gamma distribution has much smaller tails, which would shrink our credible interval.
 
 # Problem 5
 
+First let's read the data and print the basic statistics.
+
+```{r}
+df <- read.csv('./data/prostate.csv')
+hist(df$lpsa)
+```
+
+```{r}
+print(mean(df$lpsa))
+print(sd(df$lpsa)^2)
+```
+
 ## Part a
+
+As stated in problem 4, in a normal Bayesian setting with a known $\mu$ we use the Inverse Gamma distribution as the conjugate prior to model the variance parameter for the normal likelihood function. For our prior we need to set two parameters $\alpha$ and $\beta$ as described above. We will set the parameters to make the expected value of variance around 1.5 and have a high initial variance of the inverse gamma distribution to compensate for our initial lack of knowledge.
+
+\[\alpha_0 = 2 + \frac{1.5}{100}\]
+\[\beta_0 = (\alpha_0-1)*1.5\]
+
+```{r}
+expected <- 1.5
+var <- 100
+
+alpha_prior <- 2 + (expected / var)
+beta_prior <- (alpha_prior - 1)*expected
+
+curve(dinvgamma(x,alpha_prior,beta_prior),from=0,to=10,xlab="mu",ylab="",main='Prior')
+abline(v=expected,col='blue')
+```
 
 ## Part b
 
+```{r}
+X <- df$lpsa
+n <- length(X)
+alpha_post <- alpha_prior + n/2
+beta_post <-  beta_prior + 1/2*sum(X^2)
+
+curve(dinvgamma(x,alpha_post,beta_post),from=0,to=10,xlab="sigma",ylab="",main='Posterior')
+abline(v=sd(X)^2,col='red')
+```
+
+We can see that our posterior distribution maintains a similar mean, but the variance is largely decreased. This is expected as we initialized the prior parameters to have a mean near our sample mean (with our sneak peek!), so the posterior distribution takes this evidence and centers our belief distribution around the sample mean. The much smaller variance takes into account the amount of evidence we have gained through using the data. The more samples, the smaller the variance will be.
+
 ## Part c
+
+We will compute samples from the posterior as the product of our likelihood and prior. This function will help determine the acceptance probability.
+
+```{r}
+X <- df$lpsa
+
+posterior <- function(sig) {
+    likelihood <- prod(dnorm(X,mean(X),sig))
+    prior <- dinvgamma(sig, alpha_prior, beta_prior)
+    likelihood * prior
+}
+```
+
+Next we will create our proposal function. This proposal function will be a uniform distribution with width $2\tau$ where $\tau$ is a chosen width. Standard deviations produced lower than or equal to 0 will be rounded back up to just above 0.
+
+```{r}
+tau <- 1
+
+prop <- function(xprop,x) {
+    dunif(xprop, x-tau, x+tau)
+}
+
+gen_prop <- function(x) {
+    prop <- runif(1, x-tau, x+tau)
+    if (prop <= 0) {
+        prop <- 0.001
+    }
+    prop
+}
+```
+
+```{r}
+accept <- function(xp, x, prop_func) {
+    ratio <- prop_func(x, xp)*posterior(xp)/(prop_func(xp,x)*posterior(x))
+    if (is.na(ratio)) {
+        print(x)
+        print(xp)
+    }
+    if (ratio < 1) {
+        ratio
+    } else {
+        1
+    }
+}
+```
+
+```{r}
+mcmc <- function(x0, M, prop_func, gen_prop_func) {
+    # init vector
+    result <- numeric(M)
+    result[1] <- x0
+    for (i in 2:M) {
+        # get current point
+        x <- result[i-1]
+        # propose a new point
+        xprop <- gen_prop_func(x)
+        prob_accept <- accept(xprop, x, prop_func)
+        # choose whether to accept
+        accepted <- as.logical(rbinom(1,1,prob_accept))
+        if (accepted) {
+            result[i] <- xprop
+        } else {
+            result[i] <- x
+        }
+    }
+    result
+}
+```
+
+```{r}
+# sample size
+M <- 1000
+# inital point
+x0 <- 5
+
+post_samples <- mcmc(x0, M, prop, gen_prop)
+```
+
+```{r}
+plot(post_samples,type="l",lwd=2,col="blue")
+```
+
+We can see that the samples converge rather quickly, so we will just throw out the first 25:
+
+```{r}
+X <- post_samples[25:length(post_samples)]
+plot(X,type="l",lwd=2,col="blue")
+```
 
 ## Part d
 
+```{r}
+cred <- 0.05
+int <- quantile(X, probs=c(cred/2, 1-(cred/2)))
+int
+```
+
 ## Part e
+
+```{r}
+hist(X)
+abline(v=int,col='red')
+```
